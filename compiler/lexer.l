@@ -1,19 +1,17 @@
 %option noyywrap
 %option yylineno
-%option nounput
 
 %{
-#include <string>
-#include <iostream>
 
-int yylex();
+#include "parser.tab.hpp"
+
 %}
 
 %x comment
 
 %%
 "VAR"           { return VAR; }
-"BEGIN"         { return BEGIN; }
+"BEGIN"         { return TBEGIN; }
 "END"           { return END; }
 
 "ASSIGN"        { return ASSIGN; }
@@ -52,8 +50,8 @@ int yylex();
 "LEQ"           { return LEQ; }
 "GEQ"           { return GEQ; }
 
-[_a-z]+         { yylval.pidentifier = new std::string(yytext); return pidentifier; }  
--?[0-9]+        { yylval.num = std::stoll(yytext); return num; }
+[_a-z]+         { yylval = yytext[0]; return pidentifier; }  
+-?[0-9]+        { yylval = atoi(yytext); return number; }
 [\;\[\]\:\,]    { return yytext[0]; }
 
 "("             BEGIN(comment);

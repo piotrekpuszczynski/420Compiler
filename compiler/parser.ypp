@@ -1,76 +1,92 @@
 %{
-#include <iostream>
 
+#include <iostream>
+#include <string>
 using namespace std;
-}%
+
+int yylex();
+int yyerror(string);
+
+%}
+
 %start program
 
-%token VAR BEGIN END ASSIGN IF THEN ELSE ENDIF WHILE DO ENDWHILE REPEAT UNTIL FOR FROM TO DOWNTO ENDFOR READ WRITE
+%token VAR TBEGIN END ASSIGN IF THEN ELSE ENDIF WHILE DO ENDWHILE REPEAT UNTIL FOR FROM TO DOWNTO ENDFOR READ WRITE ERROR
 %token LE GE LEQ GEQ EQ NEQ
+%token pidentifier
+%token number
 
 %left PLUS MINUS
 %left TIMES DIV MOD
 
 %%
 
-program:        VAR declarations BEGIN commands END                                                     {}
-                | BEGIN commands END                                                                    {}
+program:        VAR declarations TBEGIN commands END                                                     {;}
+                | TBEGIN commands END                                                                    {;}
 ;
 
-declarations:   declarations ',' pidentifier                                                            {}
-                | declarations ',' pidentifier '[' num ':' num ']'                                      {}
-                | pidentifier                                                                           {}
-                | pidentifier '[' num ':' num ']'                                                       {}
+declarations:   declarations ',' pidentifier                                                            {;}
+                | declarations ',' pidentifier '[' number ':' number ']'                                      {;}
+                | pidentifier                                                                           {;}
+                | pidentifier '[' number ':' number ']'                                                       {;}
 ;
 
-commands:       commands command                                                                        {}
-                | command                                                                               {}
+commands:       commands command                                                                        {;}
+                | command                                                                               {;}
 ;
 
-command:        identifier ASSIGN expression ';'                                                        {}
-                | IF condition THEN commands ELSE commands ENDIF                                        {}
-                | IF condition THEN commands ENDIF                                                      {}
-                | WHILE condition DO commands ENDWHILE                                                  {}
-                | REPEAT commands UNTIL condition ';'                                                   {}
-                | FOR pidentifier FROM value TO value DO commands ENDFOR                                {}
-                | FOR pidentifier FROM value DOWNTO value DO commands ENDFOR                            {}
-                | READ identifier ';'                                                                   {}
-                | WRITE value ';'                                                                       {}
+command:        identifier ASSIGN expression ';'                                                        {;}
+                | IF condition THEN commands ELSE commands ENDIF                                        {;}
+                | IF condition THEN commands ENDIF                                                      {;}
+                | WHILE condition DO commands ENDWHILE                                                  {;}
+                | REPEAT commands UNTIL condition ';'                                                   {;}
+                | FOR pidentifier FROM value TO value DO commands ENDFOR                                {;}
+                | FOR pidentifier FROM value DOWNTO value DO commands ENDFOR                            {;}
+                | READ identifier ';'                                                                   {;}
+                | WRITE value ';'                                                                       {;}
 ;
 
-expression:     value                                                                                   {}
-                | value PLUS value                                                                      {}
-                | value MINUS value                                                                     {}
-                | value TIMES value                                                                     {}
-                | value DIV value                                                                       {}
-                | value MOD value                                                                       {}
+expression:     value                                                                                   {;}
+                | value PLUS value                                                                      {;}
+                | value MINUS value                                                                     {;}
+                | value TIMES value                                                                     {;}
+                | value DIV value                                                                       {;}
+                | value MOD value                                                                       {;}
 ;
 
-condition:      value EQ value                                                                          {}
-                | value NEQ value                                                                       {}
-                | value LE value                                                                        {}
-                | value GE value                                                                        {}
-                | value LEQ valuev                                                                      {}
+condition:      value EQ value                                                                          {;}
+                | value NEQ value                                                                       {;}
+                | value LE value                                                                        {;}
+                | value GE value                                                                        {;}
+                | value LEQ value                                                                       {;}
                 | value GEQ value
 ;
 
-value:          num                                                                                     {}
-                | identifier                                                                            {}
+value:          number                                                                                  {;}
+                identifier                                                                              {;}
 ;
 
-identifier:     pidentifier                                                                             {}
-                | pidentifier '[' pidentifier ']'                                                       {}
-                | pidentifier '[' num ']'                                                               {}
+identifier:     pidentifier                                                                             {;}
+                | pidentifier '[' pidentifier ']'                                                       {;}
+                | pidentifier '[' number ']'                                                            {;}
 ;
 
 %%
 
+int yyerror(string err) {
+    cout << err << endl;
+    exit(1);
+}
+
 int main(int argc, char** argv) {
-    if (argc < 2 !! argc > 3) {
+    if (argc < 2 || argc > 3) {
         cout << "incorrect number of arguments, correct is:" << endl;
-        cout << "./compiler <input_file> <output_file> or ./compiler <input_file>" << std;
+        cout << "./compiler <input_file> <output_file> or ./compiler <input_file>" << endl;
         return -1;
     }
+
     cout << "dziala" << endl;
   	yyparse();
+    
+    return 0;
 }
