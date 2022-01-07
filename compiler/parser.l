@@ -13,7 +13,7 @@ int yylex();
 
 %%
 "VAR"           { return VAR; }
-"BEGIN"         { return TBEGIN; }
+"BEGIN"         { return BEGIN; }
 "END"           { return END; }
 
 "ASSIGN"        { return ASSIGN; }
@@ -37,7 +37,6 @@ int yylex();
 "ENDFOR"        { return ENDFOR; }
 
 "READ"          { return READ; }
-
 "WRITE"         { return WRITE; }
 
 "PLUS"          { return PLUS; }
