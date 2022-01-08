@@ -7,14 +7,30 @@ using namespace std;
 int yylex();
 int yyerror(string);
 
+extern int yylineno;
+extern FILE *yyin;
 %}
+
+%union {
+
+std::string* pid;
+long long num;
+
+}
 
 %start program
 
-%token VAR TBEGIN END ASSIGN IF THEN ELSE ENDIF WHILE DO ENDWHILE REPEAT UNTIL FOR FROM TO DOWNTO ENDFOR READ WRITE ERROR
+%token VAR TBEGIN END
+%token ASSIGN
+%token IF THEN ELSE ENDIF
+%token WHILE DO ENDWHILE
+%token REPEAT UNTIL
+%token FOR FROM TO DOWNTO ENDFOR
+%token READ WRITE
+%token ERROR
 %token LE GE LEQ GEQ EQ NEQ
-%token pidentifier
-%token number
+%token <pid> pidentifier
+%token <num> number
 
 %left PLUS MINUS
 %left TIMES DIV MOD
@@ -63,7 +79,7 @@ condition:      value EQ value                                                  
 ;
 
 value:          number                                                                                  {;}
-                identifier                                                                              {;}
+                | identifier                                                                            {;}
 ;
 
 identifier:     pidentifier                                                                             {;}
@@ -74,19 +90,27 @@ identifier:     pidentifier                                                     
 %%
 
 int yyerror(string err) {
-    cout << err << endl;
-    exit(1);
+    cout << "error in line " << yylineno << endl;
+    cout << "error message: " << err << endl;
+    exit(-3);
 }
 
 int main(int argc, char** argv) {
+    cout << "\033[91m";
     if (argc < 2 || argc > 3) {
-        cout << "incorrect number of arguments, correct is:" << endl;
-        cout << "./compiler <input_file> <output_file> or ./compiler <input_file>" << endl;
+        cout << "incorrect number of arguments, valid run attributes:" << endl;
+        cout << "./compiler <input file> <output file> or ./compiler <input file>" << endl;
         return -1;
     }
 
-    cout << "dziala" << endl;
+    yyin = fopen(argv[1], "r");
+    if (yyin == nullptr) {
+        cout << "file " << argv[1] << " does not exist" << endl;
+        return -2;
+    }
+
   	yyparse();
     
+    cout << "\033[0m";
     return 0;
 }

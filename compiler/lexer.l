@@ -1,9 +1,13 @@
 %option noyywrap
 %option yylineno
+%option nounput
 
 %{
 
+#include <iostream>
+#include <string>
 #include "parser.tab.hpp"
+using namespace std;
 
 %}
 
@@ -50,8 +54,8 @@
 "LEQ"           { return LEQ; }
 "GEQ"           { return GEQ; }
 
-[_a-z]+         { yylval = yytext[0]; return pidentifier; }  
--?[0-9]+        { yylval = atoi(yytext); return number; }
+[_a-z]+         { yylval.pid = new string(yytext); return pidentifier; }  
+-?[0-9]+        { yylval.num = stoll(yytext); return number; }
 [\;\[\]\:\,]    { return yytext[0]; }
 
 "("             BEGIN(comment);
