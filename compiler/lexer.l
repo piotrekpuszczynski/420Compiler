@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <string>
-#include "parser.tab.hpp"
+#include "parser.hpp"
 using namespace std;
 
 %}

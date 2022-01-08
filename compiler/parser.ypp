@@ -37,54 +37,54 @@ long long num;
 
 %%
 
-program:        VAR declarations TBEGIN commands END                                                    {;}
-                | TBEGIN commands END                                                                   {;}
+program:        VAR declarations TBEGIN commands END                                    {;}
+                | TBEGIN commands END                                                   {;}
 ;
 
-declarations:   declarations ',' pidentifier                                                            {;}
-                | declarations ',' pidentifier '[' number ':' number ']'                                {;}
-                | pidentifier                                                                           {;}
-                | pidentifier '[' number ':' number ']'                                                 {;}
+declarations:   declarations ',' pidentifier                                            {;}
+                | declarations ',' pidentifier '[' number ':' number ']'                {;}
+                | pidentifier                                                           {;}
+                | pidentifier '[' number ':' number ']'                                 {;}
 ;
 
-commands:       commands command                                                                        {;}
-                | command                                                                               {;}
+commands:       commands command                                                        {;}
+                | command                                                               {;}
 ;
 
-command:        identifier ASSIGN expression ';'                                                        {;}
-                | IF condition THEN commands ELSE commands ENDIF                                        {;}
-                | IF condition THEN commands ENDIF                                                      {;}
-                | WHILE condition DO commands ENDWHILE                                                  {;}
-                | REPEAT commands UNTIL condition ';'                                                   {;}
-                | FOR pidentifier FROM value TO value DO commands ENDFOR                                {;}
-                | FOR pidentifier FROM value DOWNTO value DO commands ENDFOR                            {;}
-                | READ identifier ';'                                                                   {;}
-                | WRITE value ';'                                                                       {;}
+command:        identifier ASSIGN expression ';'                                        {;}
+                | IF condition THEN commands ELSE commands ENDIF                        {;}
+                | IF condition THEN commands ENDIF                                      {;}
+                | WHILE condition DO commands ENDWHILE                                  {;}
+                | REPEAT commands UNTIL condition ';'                                   {;}
+                | FOR pidentifier FROM value TO value DO commands ENDFOR                {;}
+                | FOR pidentifier FROM value DOWNTO value DO commands ENDFOR            {;}
+                | READ identifier ';'                                                   {;}
+                | WRITE value ';'                                                       {;}
 ;
 
-expression:     value                                                                                   {;}
-                | value PLUS value                                                                      {;}
-                | value MINUS value                                                                     {;}
-                | value TIMES value                                                                     {;}
-                | value DIV value                                                                       {;}
-                | value MOD value                                                                       {;}
+expression:     value                                                                   {;}
+                | value PLUS value                                                      {;}
+                | value MINUS value                                                     {;}
+                | value TIMES value                                                     {;}
+                | value DIV value                                                       {;}
+                | value MOD value                                                       {;}
 ;
 
-condition:      value EQ value                                                                          {;}
-                | value NEQ value                                                                       {;}
-                | value LE value                                                                        {;}
-                | value GE value                                                                        {;}
-                | value LEQ value                                                                       {;}
-                | value GEQ value
+condition:      value EQ value                                                          {;}
+                | value NEQ value                                                       {;}
+                | value LE value                                                        {;}
+                | value GE value                                                        {;}
+                | value LEQ value                                                       {;}
+                | value GEQ value                                                       {;}
 ;
 
-value:          number                                                                                  {;}
-                | identifier                                                                            {;}
+value:          number                                                                  {;}
+                | identifier                                                            {;}
 ;
 
-identifier:     pidentifier                                                                             {;}
-                | pidentifier '[' pidentifier ']'                                                       {;}
-                | pidentifier '[' number ']'                                                            {;}
+identifier:     pidentifier                                                             {;}
+                | pidentifier '[' pidentifier ']'                                       {;}
+                | pidentifier '[' number ']'                                            {;}
 ;
 
 %%
