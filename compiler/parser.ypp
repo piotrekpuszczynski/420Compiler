@@ -21,14 +21,14 @@ int yyerror(string);
 
 %%
 
-program:        VAR declarations TBEGIN commands END                                                     {;}
-                | TBEGIN commands END                                                                    {;}
+program:        VAR declarations TBEGIN commands END                                                    {;}
+                | TBEGIN commands END                                                                   {;}
 ;
 
 declarations:   declarations ',' pidentifier                                                            {;}
-                | declarations ',' pidentifier '[' number ':' number ']'                                      {;}
+                | declarations ',' pidentifier '[' number ':' number ']'                                {;}
                 | pidentifier                                                                           {;}
-                | pidentifier '[' number ':' number ']'                                                       {;}
+                | pidentifier '[' number ':' number ']'                                                 {;}
 ;
 
 commands:       commands command                                                                        {;}
