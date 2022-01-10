@@ -1,21 +1,18 @@
 %{
-
 #include <iostream>
 #include <string>
 using namespace std;
 
 int yylex();
 int yyerror(string);
+void yyset_in(FILE* data);
 
 extern int yylineno;
-extern FILE *yyin;
 %}
 
 %union {
-
 std::string* pid;
 long long num;
-
 }
 
 %start program
@@ -36,7 +33,6 @@ long long num;
 %left TIMES DIV MOD
 
 %%
-
 program:        VAR declarations TBEGIN commands END                                    {;}
                 | TBEGIN commands END                                                   {;}
 ;
@@ -86,7 +82,6 @@ identifier:     pidentifier                                                     
                 | pidentifier '[' pidentifier ']'                                       {;}
                 | pidentifier '[' number ']'                                            {;}
 ;
-
 %%
 
 int yyerror(string err) {
@@ -95,22 +90,7 @@ int yyerror(string err) {
     exit(-3);
 }
 
-int main(int argc, char** argv) {
-    cout << "\033[91m";
-    if (argc < 2 || argc > 3) {
-        cout << "incorrect number of arguments, valid run attributes:" << endl;
-        cout << "./compiler <input file> <output file> or ./compiler <input file>" << endl;
-        return -1;
-    }
-
-    yyin = fopen(argv[1], "r");
-    if (yyin == nullptr) {
-        cout << "file " << argv[1] << " does not exist" << endl;
-        return -2;
-    }
-
-  	yyparse();
-    
-    cout << "\033[0m";
-    return 0;
+void runParser(FILE* data){
+    yyset_in(data);
+    yyparse();
 }

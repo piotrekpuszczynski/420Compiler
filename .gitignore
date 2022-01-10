@@ -1,4 +1,5 @@
 *.o
-*.tab.cpp
-*.tab.hpp
+parser.cpp
+parser.hpp
+lexer.cpp
 compiler

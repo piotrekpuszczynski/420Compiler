@@ -1,16 +1,14 @@
 CC = g++
-FLAGS = -std=c++17
+FLAGS = -W -pedantic -std=c++17 -O3
+FILES = parser.o lexer.o main.o
 
-all: compiler
+all: compiler clean
 
-compiler: parser.o lexer.o
-	$(CC) $(FLAGS) -o compiler parser.o lexer.o
+compiler: $(FILES)
+	$(CC) $(FLAGS) -o compiler $(FILES)
 
-parser.o: parser.cpp
-	$(CC) $(FLAGS) -o parser.o -c parser.cpp
-
-lexer.o: lexer.cpp
-	$(CC) $(FLAGS) -o lexer.o -c lexer.cpp
+%.o: %.cpp
+	$(CC) $(FLAGS) -c $^
 
 parser.cpp: parser.ypp
 	bison -d -o parser.cpp parser.ypp
