@@ -2,7 +2,7 @@
 #include <fstream>
 using namespace std;
 
-extern void runParser(FILE* data);
+extern string parse(FILE* in);
 
 int main(int argc, char** argv) {
     cout << "\033[91m";
@@ -14,13 +14,13 @@ int main(int argc, char** argv) {
         return -1;
     }
 
-    FILE * data = fopen(argv[1], "r");
-    if (data == nullptr) {
+    FILE * in = fopen(argv[1], "r");
+    if (in == nullptr) {
         cout << "file " << argv[1] << " does not exist" << endl;
         return -2;
     }
 
-  	runParser(data);
+  	string code = parse(in);
     
     string out = "out";
     if (argv[2] != nullptr) {
@@ -28,6 +28,7 @@ int main(int argc, char** argv) {
     }
 
     ofstream binary(out);
+    binary << code;
     binary.close();
 
     cout << "\033[0m";

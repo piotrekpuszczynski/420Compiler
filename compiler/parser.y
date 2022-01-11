@@ -1,13 +1,18 @@
 %{
 #include <iostream>
 #include <string>
+#include "data.hpp"
+#include "code.hpp"
 using namespace std;
 
 int yylex();
 int yyerror(string);
-void yyset_in(FILE* data);
+void yyset_in(FILE*);
 
 extern int yylineno;
+
+Data* variables = new Data();
+Code* code = new Code();
 %}
 
 %union {
@@ -33,18 +38,18 @@ long long num;
 %left TIMES DIV MOD
 
 %%
-program:        VAR declarations TBEGIN commands END                                    {;}
-                | TBEGIN commands END                                                   {;}
+program:        VAR declarations TBEGIN commands END                                    { code->halt(); }
+                | TBEGIN commands END                                                   { code->halt(); }
 ;
 
-declarations:   declarations ',' pidentifier                                            {;}
-                | declarations ',' pidentifier '[' number ':' number ']'                {;}
-                | pidentifier                                                           {;}
-                | pidentifier '[' number ':' number ']'                                 {;}
+declarations:   declarations ',' pidentifier                                            { variables->declareVariable(*$3); }
+                | declarations ',' pidentifier '[' number ':' number ']'                { variables->declareArray(*$3, $5, $7); }
+                | pidentifier                                                           { variables->declareVariable(*$1); }
+                | pidentifier '[' number ':' number ']'                                 { variables->declareArray(*$1, $3, $5); }
 ;
 
-commands:       commands command                                                        {;}
-                | command                                                               {;}
+commands:       commands command
+                | command
 ;
 
 command:        identifier ASSIGN expression ';'                                        {;}
@@ -90,7 +95,8 @@ int yyerror(string err) {
     exit(-3);
 }
 
-void runParser(FILE* data){
-    yyset_in(data);
+string parse(FILE* in){
+    yyset_in(in);
     yyparse();
+    return code->getCode();
 }
