@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <unordered_map>
 #include "variable.hpp"
@@ -12,4 +14,5 @@ public:
     void declareVariable(string);
     void declareArray(string, long long, long long);
     bool isDeclared(string);
+    Variable* getVariable(string);
 };

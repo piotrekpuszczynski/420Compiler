@@ -1,9 +1,10 @@
+#include <iostream>
 #include <string>
 #include "data.hpp"
 using namespace std;
 
 Data::Data() {
-    this->offset = 1;
+    this->offset = 0;
 }
 
 // TODO exception if variable is already defined
@@ -23,5 +24,9 @@ void Data::declareArray(string id, long long start, long long end) {
 }
 
 bool Data::isDeclared(string id) {
-    return this->variables.find(id) == variables.end();
+    return this->variables.find(id) != variables.end();
+}
+
+Variable* Data::getVariable(string id) {
+    return this->variables[id];
 }

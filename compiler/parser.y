@@ -11,13 +11,18 @@ void yyset_in(FILE*);
 
 extern int yylineno;
 
-Data* variables = new Data();
-Code* code = new Code();
+Data* _data = new Data();
+Code* _code = new Code(_data);
 %}
+
+%code requires {
+#include "variable.hpp"
+}
 
 %union {
 std::string* pid;
 long long num;
+Variable* variable;
 }
 
 %start program
@@ -37,19 +42,22 @@ long long num;
 %left PLUS MINUS
 %left TIMES DIV MOD
 
+%type <variable> value
+%type <variable> identifier
+
 %%
-program:        VAR declarations TBEGIN commands END                                    { code->halt(); }
-                | TBEGIN commands END                                                   { code->halt(); }
+program:        VAR declarations TBEGIN commands END                                    { _code->halt(); }
+                | TBEGIN commands END                                                   { _code->halt(); }
 ;
 
-declarations:   declarations ',' pidentifier                                            { variables->declareVariable(*$3); }
-                | declarations ',' pidentifier '[' number ':' number ']'                { variables->declareArray(*$3, $5, $7); }
-                | pidentifier                                                           { variables->declareVariable(*$1); }
-                | pidentifier '[' number ':' number ']'                                 { variables->declareArray(*$1, $3, $5); }
+declarations:   declarations ',' pidentifier                                            { _data->declareVariable(*$3); }
+                | declarations ',' pidentifier '[' number ':' number ']'                { _data->declareArray(*$3, $5, $7); }
+                | pidentifier                                                           { _data->declareVariable(*$1); }
+                | pidentifier '[' number ':' number ']'                                 { _data->declareArray(*$1, $3, $5); }
 ;
 
-commands:       commands command
-                | command
+commands:       commands command    {;}
+                | command   {;}
 ;
 
 command:        identifier ASSIGN expression ';'                                        {;}
@@ -59,8 +67,8 @@ command:        identifier ASSIGN expression ';'                                
                 | REPEAT commands UNTIL condition ';'                                   {;}
                 | FOR pidentifier FROM value TO value DO commands ENDFOR                {;}
                 | FOR pidentifier FROM value DOWNTO value DO commands ENDFOR            {;}
-                | READ identifier ';'                                                   {;}
-                | WRITE value ';'                                                       {;}
+                | READ identifier ';'                                                   { _code->read($2); }
+                | WRITE value ';'                                                       { _code->write($2); }
 ;
 
 expression:     value                                                                   {;}
@@ -79,13 +87,13 @@ condition:      value EQ value                                                  
                 | value GEQ value                                                       {;}
 ;
 
-value:          number                                                                  {;}
-                | identifier                                                            {;}
+value:          number                                                                  { $$ = _code->getNumber($1); }
+                | identifier                                                            { $$ = $1; }
 ;
 
-identifier:     pidentifier                                                             {;}
-                | pidentifier '[' pidentifier ']'                                       {;}
-                | pidentifier '[' number ']'                                            {;}
+identifier:     pidentifier                                                             { $$ = _code->getVariable(*$1); }
+                | pidentifier '[' pidentifier ']'                                       { $$ = _code->getVariable(*$1, *$3); }
+                | pidentifier '[' number ']'                                            { $$ = _code->getVariable(*$1, $3); }
 ;
 %%
 
@@ -98,5 +106,5 @@ int yyerror(string err) {
 string parse(FILE* in){
     yyset_in(in);
     yyparse();
-    return code->getCode();
+    return _code->getCode();
 }

@@ -1,3 +1,5 @@
+#pragma once
+
 class Variable {
 public:
     long long offset;

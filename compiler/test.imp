@@ -1,6 +1,6 @@
 VAR
-    a, b[0:2]
+    a, b, c, d
 BEGIN
-    a ASSIGN 1;
-    WRITE a;
+    READ d;
+    WRITE d;
 END

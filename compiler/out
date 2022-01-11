@@ -1,1 +1,18 @@
+RESET b
+INC b
+INC b
+RESET a
+INC a
+SHIFT b
+SWAP b
+GET
+STORE b
+RESET b
+INC b
+INC b
+RESET a
+INC a
+SHIFT b
+LOAD a
+PUT
 HALT
