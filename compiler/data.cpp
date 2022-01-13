@@ -27,6 +27,10 @@ bool Data::isDeclared(string id) {
     return this->variables.find(id) != variables.end();
 }
 
-Variable* Data::getVariable(string id) {
+Symbol* Data::getSymbol(string id) {
     return this->variables[id];
+}
+
+Symbol* Data::getSymbol(string id, long long index) {
+    return this->variables[id]->getSymbol(index);
 }

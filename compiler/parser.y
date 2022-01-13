@@ -16,13 +16,13 @@ Code* _code = new Code(_data);
 %}
 
 %code requires {
-#include "variable.hpp"
+#include "symbol.hpp"
 }
 
 %union {
 std::string* pid;
 long long num;
-Variable* variable;
+Symbol* symbol;
 }
 
 %start program
@@ -42,8 +42,9 @@ Variable* variable;
 %left PLUS MINUS
 %left TIMES DIV MOD
 
-%type <variable> value
-%type <variable> identifier
+%type <symbol> value
+%type <symbol> identifier
+%type <symbol> expression
 
 %%
 program:        VAR declarations TBEGIN commands END                                    { _code->halt(); }
@@ -56,11 +57,11 @@ declarations:   declarations ',' pidentifier                                    
                 | pidentifier '[' number ':' number ']'                                 { _data->declareArray(*$1, $3, $5); }
 ;
 
-commands:       commands command    {;}
-                | command   {;}
+commands:       commands command
+                | command
 ;
 
-command:        identifier ASSIGN expression ';'                                        {;}
+command:        identifier ASSIGN expression ';'                                        { _code->assign($1, $3); }
                 | IF condition THEN commands ELSE commands ENDIF                        {;}
                 | IF condition THEN commands ENDIF                                      {;}
                 | WHILE condition DO commands ENDWHILE                                  {;}
@@ -71,12 +72,12 @@ command:        identifier ASSIGN expression ';'                                
                 | WRITE value ';'                                                       { _code->write($2); }
 ;
 
-expression:     value                                                                   {;}
-                | value PLUS value                                                      {;}
-                | value MINUS value                                                     {;}
-                | value TIMES value                                                     {;}
-                | value DIV value                                                       {;}
-                | value MOD value                                                       {;}
+expression:     value                                                                   { $$ = $1; }
+                | value PLUS value                                                      { $$ = _code->plus($1, $3); }
+                | value MINUS value                                                     { $$ = _code->minus($1, $3); }
+                | value TIMES value                                                     { $$ = _code->times($1, $3); }
+                | value DIV value                                                       { $$ = _code->div($1, $3); }
+                | value MOD value                                                       { $$ = _code->mod($1, $3); }
 ;
 
 condition:      value EQ value                                                          {;}
@@ -91,9 +92,9 @@ value:          number                                                          
                 | identifier                                                            { $$ = $1; }
 ;
 
-identifier:     pidentifier                                                             { $$ = _code->getVariable(*$1); }
-                | pidentifier '[' pidentifier ']'                                       { $$ = _code->getVariable(*$1, *$3); }
-                | pidentifier '[' number ']'                                            { $$ = _code->getVariable(*$1, $3); }
+identifier:     pidentifier                                                             { $$ = _code->getSymbol(*$1); }
+                | pidentifier '[' pidentifier ']'                                       { $$ = _code->getSymbol(*$1, *$3); }
+                | pidentifier '[' number ']'                                            { $$ = _code->getSymbol(*$1, $3); }
 ;
 %%
 

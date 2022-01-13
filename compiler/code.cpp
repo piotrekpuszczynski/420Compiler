@@ -1,5 +1,6 @@
 #include <string>
 #include <cmath>
+#include <iostream>
 #include "code.hpp"
 #include "data.hpp"
 using namespace std;
@@ -8,6 +9,15 @@ Code::Code(Data* data) {
     this->k = 0;
     this->code = "";
     this->data = data;
+    this->reset('a');
+    this->reset('b');
+    this->reset('c');
+    this->reset('d');
+    this->reset('e');
+    this->reset('f');
+    this->reset('g');
+    this->reset('h');
+    this->data->declareVariable("$$");
 }
 
 void Code::atomic(string instruction) {
@@ -89,77 +99,175 @@ void Code::halt() {
     this->atomic("HALT");
 }
 
-void Code::assign(long long value) {
-    
-}
-
-void Code::read(Variable* var) {
-    long long offset = var->getOffset();
-    long long memory = 0;
-
-    while (offset > 0) {
-        offset /= 2;
-        memory++;
-    }
-
-    offset = var->getOffset();
-    offset = offset - pow(2, memory);
-
-    this->reset('b');
-    for (int i = 0; i < memory; i++) this->inc('b');
+void Code::assign(Symbol* id, Symbol* exp) {
+    this->getMemory(id->getOffset());
+    this->swap('c');
 
     this->reset('a');
-    this->inc('a');
-    this->shift('b');
-    for (int i = 0; i < offset; i++) this->inc('a');
+    this->reset('b');
+
+    this->getMemory(exp->getOffset());
+    this->load('a');
+    this->store('c');
+
+    this->reset('a');
+    this->reset('b');
+    this->reset('c');
+}
+
+void Code::read(Symbol* var) {
+    this->getMemory(var->getOffset());
     this->swap('b');
     this->get();
     this->store('b');
+
+    this->reset('a');
+    this->reset('b');
 }
 
-void Code::write(Variable* var) {
-    long long offset = var->getOffset();
+void Code::write(Symbol* var) {
+    this->getMemory(var->getOffset());
+    this->load('a');
+    this->put();
+
+    this->reset('a');
+    this->reset('b');
+}
+
+Symbol* Code::plus(Symbol* a, Symbol* b) {
+    this->getMemory(b->getOffset());
+    this->load('a');
+    this->swap('c');
+
+    this->reset('a');
+    this->reset('b');
+
+    this->getMemory(a->getOffset());
+    this->load('a');
+    this->add('c');
+
+    this->swap('c');
+
+    this->reset('a');
+    this->reset('b');
+
+    this->getMemory(0);
+    this->swap('c');
+    this->store('c');
+
+    this->reset('a');
+    this->reset('b');
+    this->reset('c');
+    return this->data->getSymbol("$$");
+}
+
+Symbol* Code::minus(Symbol* a, Symbol* b) {
+    this->getMemory(b->getOffset());
+    this->load('a');
+    this->swap('c');
+
+    this->reset('a');
+    this->reset('b');
+
+    this->getMemory(a->getOffset());
+    this->load('a');
+    this->sub('c');
+
+    this->swap('c');
+
+    this->reset('a');
+    this->reset('b');
+
+    this->getMemory(0);
+    this->swap('c');
+    this->store('c');
+
+    this->reset('a');
+    this->reset('b');
+    this->reset('c');
+    return this->data->getSymbol("$$");
+}
+
+Symbol* Code::times(Symbol* a, Symbol* b) {
+    return this->data->getSymbol("$$");
+}
+
+Symbol* Code::div(Symbol* a, Symbol* b) {
+    return this->data->getSymbol("$$");
+}
+
+Symbol* Code::mod(Symbol* a, Symbol* b) {
+    return this->data->getSymbol("$$");
+}
+
+void Code::getMemory(long long offset) {
+    long long temp = offset;
     long long memory = 0;
 
-    while (offset > 0) {
-        offset /= 2;
+    while (temp > 1) {
+        temp /= 2;
         memory++;
     }
 
-    offset = var->getOffset();
-    offset = offset - pow(2, memory);
+    temp = offset;
+    temp = temp - pow(2, memory);
 
-    this->reset('b');
     for (int i = 0; i < memory; i++) this->inc('b');
-
-    this->reset('a');
     this->inc('a');
     this->shift('b');
-    for (int i = 0; i < offset; i++) this->inc('a');
-    this->load('a');
-    this->put();
+    for (int i = 0; i < temp; i++) this->inc('a');
+}
+
+void Code::getValue(long long value) {
+    long long asAbs = abs(value);
+    this->getMemory(asAbs);
+
+    this->reset('b');
+    
+    if (value != asAbs) {
+        this->swap('b');
+        this->sub('b');
+    }
 }
 
 string Code::getCode() {
     return this->code;
 }
 
-Variable* Code::getVariable(string id) {
-    return this->data->getVariable(id);
+Symbol* Code::getSymbol(string id) {
+    return this->data->getSymbol(id);
 }
 
-Variable* Code::getVariable(string id, string index) {
-    return this->data->getVariable(id);
+Symbol* Code::getSymbol(string id, string index) {
+    this->getMemory(this->data->getSymbol(index)->getOffset());
+
+    return this->data->getSymbol(id, 0);
 }
 
-Variable* Code::getVariable(string id, long long index) {
-    return this->data->getVariable(id);
+Symbol* Code::getSymbol(string id, long long index) {
+    return this->data->getSymbol(id, index);
 }
 
-Variable* Code::getNumber(long long value) {
-    if (this->data->isDeclared(to_string(value))) {
-        return this->getVariable(to_string(value));
-    }
-    this->data->declareVariable(to_string(value));
-    return this->getVariable(to_string(value));
+Symbol* Code::getNumber(long long value) {
+    string asString = to_string(value);
+    if (this->data->isDeclared(asString))
+        return this->getSymbol(asString);
+
+    this->data->declareVariable(asString);
+    Symbol* var = this->getSymbol(asString);
+
+    this->getMemory(var->getOffset());
+    this->swap('c');
+
+    this->reset('a');
+    this->reset('b');
+
+    this->getValue(value);
+    this->store('c');
+
+    this->reset('a');
+    this->reset('b');
+    this->reset('c');
+
+    return var;
 }

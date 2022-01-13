@@ -2,17 +2,18 @@
 
 #include <string>
 #include <unordered_map>
-#include "variable.hpp"
+#include "symbol.hpp"
 using namespace std;
 
 class Data {
 public:
     long long offset;
-    unordered_map<string, Variable*> variables;
+    unordered_map<string, Symbol*> variables;
 
     Data();
     void declareVariable(string);
     void declareArray(string, long long, long long);
     bool isDeclared(string);
-    Variable* getVariable(string);
+    Symbol* getSymbol(string);
+    Symbol* getSymbol(string, long long);
 };

@@ -30,12 +30,20 @@ public:
     void jneg(long long);
     void halt();
 
-    Variable* getVariable(string);
-    Variable* getVariable(string, string);
-    Variable* getVariable(string, long long);
-    Variable* getNumber(long long);
-    void assign(long long);
-    void read(Variable*);
-    void write(Variable*);
+    void read(Symbol*);
+    void write(Symbol*);
+    void assign(Symbol*, Symbol*);
+    Symbol* plus(Symbol*, Symbol*);
+    Symbol* minus(Symbol*, Symbol*);
+    Symbol* times(Symbol*, Symbol*);
+    Symbol* div(Symbol*, Symbol*);
+    Symbol* mod(Symbol*, Symbol*);
+
+    Symbol* getSymbol(string);
+    Symbol* getSymbol(string, string);
+    Symbol* getSymbol(string, long long);
+    Symbol* getNumber(long long);
+    void getMemory(long long);
+    void getValue(long long);
     string getCode();
 };
