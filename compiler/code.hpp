@@ -45,5 +45,7 @@ public:
     Symbol* getNumber(long long);
     void getMemory(long long);
     void getValue(long long);
+    void incLoop(long long);
+    void decLoop(long long);
     string getCode();
 };

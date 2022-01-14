@@ -189,15 +189,76 @@ Symbol* Code::minus(Symbol* a, Symbol* b) {
 }
 
 Symbol* Code::times(Symbol* a, Symbol* b) {
+    this->getMemory(b->getOffset());
+    this->load('a');
+    this->swap('c');
+
+    this->reset('a');
+    this->reset('b');
+
+    this->getMemory(a->getOffset());
+    this->load('a');
+
+    this->reset('b');
+
+    this->jzero(15);
+
+    this->jneg(7);
+    this->dec('a');
+    this->swap('b');
+    this->add('c');
+    this->swap('b');
+    this->jzero(9);
+    this->jump(-5);
+
+    this->jpos(7);
+    this->inc('a');
+    this->swap('b');
+    this->sub('c');
+    this->swap('b');
+    this->jzero(2);
+    this->jump(-5);
+
+    this->swap('b');
+    this->swap('c');
+    this->reset('a');
+    this->getMemory(0);
+    this->swap('c');
+    this->store('c');
+
+    this->reset('a');
+    this->reset('b');
+    this->reset('c');
+
     return this->data->getSymbol("$$");
 }
 
 Symbol* Code::div(Symbol* a, Symbol* b) {
+    this->getMemory(b->getOffset());
+    this->load('a');
+    this->swap('c');
+
+    this->reset('a');
+    this->reset('b');
+
+    this->getMemory(a->getOffset());
+    this->load('a');
+
+    this->reset('b');
+    
     return this->data->getSymbol("$$");
 }
 
 Symbol* Code::mod(Symbol* a, Symbol* b) {
     return this->data->getSymbol("$$");
+}
+
+void Code::incLoop(long long) {
+
+}
+
+void Code::decLoop(long long) {
+
 }
 
 void Code::getMemory(long long offset) {
