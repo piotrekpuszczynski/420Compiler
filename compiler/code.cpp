@@ -234,18 +234,53 @@ Symbol* Code::times(Symbol* a, Symbol* b) {
 }
 
 Symbol* Code::div(Symbol* a, Symbol* b) {
-    this->getMemory(b->getOffset());
+    this->getMemory(a->getOffset());
     this->load('a');
     this->swap('c');
 
     this->reset('a');
     this->reset('b');
 
-    this->getMemory(a->getOffset());
+    this->getMemory(b->getOffset());
     this->load('a');
 
     this->reset('b');
-    
+
+    this->jzero(30);
+
+    this->swap('c');
+    this->jpos(4); // if a is neg changes it to pos
+    this->swap('b');
+    this->sub('b');
+    this->reset('b');
+
+    this->swap('c');
+    this->jneg(6);
+    //b+
+    this->swap('c');
+    this->sub('c');
+    this->jneg(8);//end
+    this->inc('b');
+    this->jump(-3);
+    //b-
+    this->swap('c');
+    this->add('c');
+    this->jneg(3);//end
+    this->dec('b');
+    this->jump(-3);
+
+    this->swap('b');
+    this->swap('c');
+    this->reset('a');
+    this->reset('b');
+    this->getMemory(0);
+    this->swap('c');
+    this->store('c');
+
+    this->reset('a');
+    this->reset('b');
+    this->reset('c');
+
     return this->data->getSymbol("$$");
 }
 
