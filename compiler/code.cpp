@@ -246,7 +246,7 @@ Symbol* Code::div(Symbol* a, Symbol* b) {
 
     this->reset('b');
 
-    this->jzero(30);
+    this->jzero(18);
 
     this->swap('c');
     this->jpos(4); // if a is neg changes it to pos
@@ -259,13 +259,13 @@ Symbol* Code::div(Symbol* a, Symbol* b) {
     //b+
     this->swap('c');
     this->sub('c');
-    this->jneg(8);//end
+    this->jneg(8);
     this->inc('b');
     this->jump(-3);
     //b-
     this->swap('c');
     this->add('c');
-    this->jneg(3);//end
+    this->jneg(3);
     this->dec('b');
     this->jump(-3);
 
@@ -285,6 +285,58 @@ Symbol* Code::div(Symbol* a, Symbol* b) {
 }
 
 Symbol* Code::mod(Symbol* a, Symbol* b) {
+
+    this->getMemory(a->getOffset());
+    this->load('a');
+    this->swap('c');
+
+    this->reset('a');
+    this->reset('b');
+
+    this->getMemory(b->getOffset());
+    this->load('a');
+
+    this->reset('b');
+
+    this->jzero(19);
+
+    this->swap('c');
+    this->jpos(4);
+    this->swap('b');
+    this->sub('b');
+    this->reset('b');
+
+    this->swap('c');
+    this->jneg(7);
+    //b+
+    this->swap('c');
+    this->sub('c');
+    this->jneg(2);
+    this->jump(-2);
+
+    this->add('c');
+    this->jump(6);
+
+    //b-
+    this->swap('c');
+    this->add('c');
+    this->jneg(2);
+    this->jump(-2);
+
+    this->sub('c');
+    this->swap('b');
+    this->sub('b');
+
+    this->swap('c');
+    this->reset('a');
+    this->reset('b');
+    this->getMemory(0);
+    this->swap('c');
+    this->store('c');
+
+    this->reset('a');
+    this->reset('b');
+    this->reset('c');
     return this->data->getSymbol("$$");
 }
 
