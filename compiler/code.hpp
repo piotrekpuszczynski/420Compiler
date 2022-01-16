@@ -38,6 +38,12 @@ public:
     Symbol* times(Symbol*, Symbol*);
     Symbol* div(Symbol*, Symbol*);
     Symbol* mod(Symbol*, Symbol*);
+    Symbol* eq(Symbol*, Symbol*);
+    Symbol* neq(Symbol*, Symbol*);
+    Symbol* le(Symbol*, Symbol*);
+    Symbol* ge(Symbol*, Symbol*);
+    Symbol* leq(Symbol*, Symbol*);
+    Symbol* geq(Symbol*, Symbol*);
 
     Symbol* getSymbol(string);
     Symbol* getSymbol(string, string);

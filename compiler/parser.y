@@ -45,6 +45,7 @@ Symbol* symbol;
 %type <symbol> value
 %type <symbol> identifier
 %type <symbol> expression
+%type <symbol> condition
 
 %%
 program:        VAR declarations TBEGIN commands END                                    { _code->halt(); }
@@ -80,12 +81,12 @@ expression:     value                                                           
                 | value MOD value                                                       { $$ = _code->mod($1, $3); }
 ;
 
-condition:      value EQ value                                                          {;}
-                | value NEQ value                                                       {;}
-                | value LE value                                                        {;}
-                | value GE value                                                        {;}
-                | value LEQ value                                                       {;}
-                | value GEQ value                                                       {;}
+condition:      value EQ value                                                          { $$ = _code->eq($1, $3); }
+                | value NEQ value                                                       { $$ = _code->neq($1, $3); }
+                | value LE value                                                        { $$ = _code->le($1, $3); }
+                | value GE value                                                        { $$ = _code->ge($1, $3); }
+                | value LEQ value                                                       { $$ = _code->leq($1, $3); }
+                | value GEQ value                                                       { $$ = _code->geq($1, $3); }
 ;
 
 value:          number                                                                  { $$ = _code->getNumber($1); }

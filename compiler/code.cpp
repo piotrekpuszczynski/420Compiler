@@ -308,7 +308,7 @@ Symbol* Code::mod(Symbol* a, Symbol* b) {
 
     this->swap('c');
     this->jneg(7);
-    //b+
+
     this->swap('c');
     this->sub('c');
     this->jneg(2);
@@ -317,7 +317,6 @@ Symbol* Code::mod(Symbol* a, Symbol* b) {
     this->add('c');
     this->jump(6);
 
-    //b-
     this->swap('c');
     this->add('c');
     this->jneg(2);
@@ -326,6 +325,212 @@ Symbol* Code::mod(Symbol* a, Symbol* b) {
     this->sub('c');
     this->swap('b');
     this->sub('b');
+
+    this->swap('c');
+    this->reset('a');
+    this->reset('b');
+    this->getMemory(0);
+    this->swap('c');
+    this->store('c');
+
+    this->reset('a');
+    this->reset('b');
+    this->reset('c');
+    return this->data->getSymbol("$$");
+}
+
+Symbol* Code::eq(Symbol* a, Symbol* b) {
+    this->getMemory(b->getOffset());
+    this->load('a');
+    this->swap('c');
+
+    this->reset('a');
+    this->reset('b');
+
+    this->getMemory(a->getOffset());
+    this->load('a');
+
+    this->reset('b');
+
+    this->sub('b');
+    this->reset('c');
+
+    this->swap('c');
+    this->reset('b');
+    this->getMemory(0);
+    this->swap('c');
+    this->store('c');
+
+    this->reset('a');
+    this->reset('b');
+    this->reset('c');
+    return this->data->getSymbol("$$");
+}
+
+Symbol* Code::neq(Symbol* a, Symbol* b) {
+    this->getMemory(b->getOffset());
+    this->load('a');
+    this->swap('c');
+
+    this->reset('a');
+    this->reset('b');
+
+    this->getMemory(a->getOffset());
+    this->load('a');
+
+    this->reset('b');
+
+    this->sub('b');
+    this->reset('c');
+
+
+    this->inc('a');
+    this->jzero(2);
+    this->inc('a');
+
+
+    this->swap('c');
+    this->reset('a');
+    this->getMemory(0);
+    this->swap('c');
+    this->store('c');
+
+    this->reset('a');
+    this->reset('b');
+    this->reset('c');
+    return this->data->getSymbol("$$");
+}
+
+Symbol* Code::le(Symbol* a, Symbol* b) {
+    this->getMemory(b->getOffset());
+    this->load('a');
+    this->swap('c');
+
+    this->reset('a');
+    this->reset('b');
+
+    this->getMemory(a->getOffset());
+    this->load('a');
+
+    this->reset('b');
+
+    this->sub('b');
+    this->reset('c');
+
+
+    this->jpos(2);
+    this->jump(2);
+    this->reset('a');
+
+
+    this->swap('c');
+    this->reset('a');
+    this->reset('b');
+    this->getMemory(0);
+    this->swap('c');
+    this->store('c');
+
+    this->reset('a');
+    this->reset('b');
+    this->reset('c');
+    return this->data->getSymbol("$$");
+}
+
+Symbol* Code::ge(Symbol* a, Symbol* b) {
+    this->getMemory(b->getOffset());
+    this->load('a');
+    this->swap('c');
+
+    this->reset('a');
+    this->reset('b');
+
+    this->getMemory(a->getOffset());
+    this->load('a');
+
+    this->reset('b');
+
+    this->sub('b');
+    this->reset('c');
+
+
+    this->jneg(2);
+    this->jump(2);
+    this->reset('a');
+
+
+    this->swap('c');
+    this->reset('a');
+    this->reset('b');
+    this->getMemory(0);
+    this->swap('c');
+    this->store('c');
+
+    this->reset('a');
+    this->reset('b');
+    this->reset('c');
+    return this->data->getSymbol("$$");
+}
+
+Symbol* Code::leq(Symbol* a, Symbol* b) {
+    this->getMemory(b->getOffset());
+    this->load('a');
+    this->swap('c');
+
+    this->reset('a');
+    this->reset('b');
+
+    this->getMemory(a->getOffset());
+    this->load('a');
+
+    this->reset('b');
+
+    this->sub('b');
+    this->reset('c');
+
+
+    this->jpos(3);
+    this->jzero(3);
+    this->jump(2);
+
+    this->reset('a');
+
+
+    this->swap('c');
+    this->reset('a');
+    this->reset('b');
+    this->getMemory(0);
+    this->swap('c');
+    this->store('c');
+
+    this->reset('a');
+    this->reset('b');
+    this->reset('c');
+    return this->data->getSymbol("$$");
+}
+
+Symbol* Code::geq(Symbol* a, Symbol* b) {
+    this->getMemory(b->getOffset());
+    this->load('a');
+    this->swap('c');
+
+    this->reset('a');
+    this->reset('b');
+
+    this->getMemory(a->getOffset());
+    this->load('a');
+
+    this->reset('b');
+
+    this->sub('b');
+    this->reset('c');
+
+
+    this->jneg(3);
+    this->jzero(3);
+    this->jump(2);
+
+    this->reset('a');
+
 
     this->swap('c');
     this->reset('a');
