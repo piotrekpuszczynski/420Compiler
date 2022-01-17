@@ -1,7 +1,6 @@
 %{
 #include <iostream>
 #include <string>
-#include "data.hpp"
 #include "code.hpp"
 using namespace std;
 
@@ -17,12 +16,14 @@ Code* _code = new Code(_data);
 
 %code requires {
 #include "symbol.hpp"
+#include "data.hpp"
 }
 
 %union {
 std::string* pid;
 long long num;
 Symbol* symbol;
+Cond* cond;
 }
 
 %start program
@@ -45,7 +46,7 @@ Symbol* symbol;
 %type <symbol> value
 %type <symbol> identifier
 %type <symbol> expression
-%type <symbol> condition
+%type <cond> condition
 
 %%
 program:        VAR declarations TBEGIN commands END                                    { _code->halt(); }
@@ -64,7 +65,7 @@ commands:       commands command
 
 command:        identifier ASSIGN expression ';'                                        { _code->assign($1, $3); }
                 | IF condition THEN commands ELSE commands ENDIF                        {;}
-                | IF condition THEN commands ENDIF                                      {;}
+                | IF condition THEN commands ENDIF                                      { _code->ifBlock($2); }
                 | WHILE condition DO commands ENDWHILE                                  {;}
                 | REPEAT commands UNTIL condition ';'                                   {;}
                 | FOR pidentifier FROM value TO value DO commands ENDFOR                {;}

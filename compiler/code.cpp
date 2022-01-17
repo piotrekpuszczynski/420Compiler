@@ -7,7 +7,6 @@ using namespace std;
 
 Code::Code(Data* data) {
     this->k = 0;
-    this->code = "";
     this->data = data;
     this->reset('a');
     this->reset('b');
@@ -21,17 +20,17 @@ Code::Code(Data* data) {
 }
 
 void Code::atomic(string instruction) {
-    this->code += instruction + "\n";
+    this->code.push_back(instruction + "\n");
     this->k++;
 }
 
 void Code::atomic(string instruction, long long value) {
-    this->code += instruction + " " + to_string(value) + "\n";
+    this->code.push_back(instruction + " " + to_string(value) + "\n");
     this->k++;
 }
 
 void Code::atomic(string instruction, char value) {
-    this->code += instruction + " " + value + "\n";
+    this->code.push_back(instruction + " " + value + "\n");
     this->k++;
 }
 
@@ -77,6 +76,11 @@ void Code::inc(char x) {
 
 void Code::dec(char x) {
     this->atomic("DEC", x);
+}
+
+void Code::jump() {
+    this->code.push_back("JUMP");
+    this->k++;
 }
 
 void Code::jump(long long j) {
@@ -315,7 +319,7 @@ Symbol* Code::mod(Symbol* a, Symbol* b) {
     this->jump(-2);
 
     this->add('c');
-    this->jump(6);
+    this->jump(8);
 
     this->swap('c');
     this->add('c');
@@ -339,7 +343,7 @@ Symbol* Code::mod(Symbol* a, Symbol* b) {
     return this->data->getSymbol("$$");
 }
 
-Symbol* Code::eq(Symbol* a, Symbol* b) {
+Cond* Code::eq(Symbol* a, Symbol* b) {
     this->getMemory(b->getOffset());
     this->load('a');
     this->swap('c');
@@ -352,56 +356,18 @@ Symbol* Code::eq(Symbol* a, Symbol* b) {
 
     this->reset('b');
 
-    this->sub('b');
+    this->sub('c');
     this->reset('c');
 
-    this->swap('c');
-    this->reset('b');
-    this->getMemory(0);
-    this->swap('c');
-    this->store('c');
-
-    this->reset('a');
-    this->reset('b');
-    this->reset('c');
-    return this->data->getSymbol("$$");
-}
-
-Symbol* Code::neq(Symbol* a, Symbol* b) {
-    this->getMemory(b->getOffset());
-    this->load('a');
-    this->swap('c');
-
-    this->reset('a');
-    this->reset('b');
-
-    this->getMemory(a->getOffset());
-    this->load('a');
-
-    this->reset('b');
-
-    this->sub('b');
-    this->reset('c');
-
-
-    this->inc('a');
     this->jzero(2);
-    this->inc('a');
-
-
-    this->swap('c');
-    this->reset('a');
-    this->getMemory(0);
-    this->swap('c');
-    this->store('c');
+    long long start = this->k;
+    this->jump();
 
     this->reset('a');
-    this->reset('b');
-    this->reset('c');
-    return this->data->getSymbol("$$");
+    return new Cond(start, this->data->getSymbol("$$"));
 }
 
-Symbol* Code::le(Symbol* a, Symbol* b) {
+Cond* Code::neq(Symbol* a, Symbol* b) {
     this->getMemory(b->getOffset());
     this->load('a');
     this->swap('c');
@@ -414,29 +380,19 @@ Symbol* Code::le(Symbol* a, Symbol* b) {
 
     this->reset('b');
 
-    this->sub('b');
+    this->sub('c');
     this->reset('c');
 
-
-    this->jpos(2);
+    this->jzero(2);
     this->jump(2);
-    this->reset('a');
-
-
-    this->swap('c');
-    this->reset('a');
-    this->reset('b');
-    this->getMemory(0);
-    this->swap('c');
-    this->store('c');
+    long long start = this->k;
+    this->jump();
 
     this->reset('a');
-    this->reset('b');
-    this->reset('c');
-    return this->data->getSymbol("$$");
+    return new Cond(start, this->data->getSymbol("$$"));
 }
 
-Symbol* Code::ge(Symbol* a, Symbol* b) {
+Cond* Code::le(Symbol* a, Symbol* b) {
     this->getMemory(b->getOffset());
     this->load('a');
     this->swap('c');
@@ -449,29 +405,18 @@ Symbol* Code::ge(Symbol* a, Symbol* b) {
 
     this->reset('b');
 
-    this->sub('b');
+    this->sub('c');
     this->reset('c');
-
 
     this->jneg(2);
-    this->jump(2);
-    this->reset('a');
-
-
-    this->swap('c');
-    this->reset('a');
-    this->reset('b');
-    this->getMemory(0);
-    this->swap('c');
-    this->store('c');
+    long long start = this->k;
+    this->jump();
 
     this->reset('a');
-    this->reset('b');
-    this->reset('c');
-    return this->data->getSymbol("$$");
+    return new Cond(start, this->data->getSymbol("$$"));
 }
 
-Symbol* Code::leq(Symbol* a, Symbol* b) {
+Cond* Code::ge(Symbol* a, Symbol* b) {
     this->getMemory(b->getOffset());
     this->load('a');
     this->swap('c');
@@ -484,31 +429,18 @@ Symbol* Code::leq(Symbol* a, Symbol* b) {
 
     this->reset('b');
 
-    this->sub('b');
+    this->sub('c');
     this->reset('c');
 
-
-    this->jpos(3);
-    this->jzero(3);
-    this->jump(2);
-
-    this->reset('a');
-
-
-    this->swap('c');
-    this->reset('a');
-    this->reset('b');
-    this->getMemory(0);
-    this->swap('c');
-    this->store('c');
+    this->jpos(2);
+    long long start = this->k;
+    this->jump();
 
     this->reset('a');
-    this->reset('b');
-    this->reset('c');
-    return this->data->getSymbol("$$");
+    return new Cond(start, this->data->getSymbol("$$"));
 }
 
-Symbol* Code::geq(Symbol* a, Symbol* b) {
+Cond* Code::leq(Symbol* a, Symbol* b) {
     this->getMemory(b->getOffset());
     this->load('a');
     this->swap('c');
@@ -521,28 +453,46 @@ Symbol* Code::geq(Symbol* a, Symbol* b) {
 
     this->reset('b');
 
-    this->sub('b');
+    this->sub('c');
     this->reset('c');
 
-
-    this->jneg(3);
     this->jzero(3);
-    this->jump(2);
+    this->jneg(2);
+    long long start = this->k;
+    this->jump();
 
     this->reset('a');
+    return new Cond(start, this->data->getSymbol("$$"));
+}
 
-
+Cond* Code::geq(Symbol* a, Symbol* b) {
+    this->getMemory(b->getOffset());
+    this->load('a');
     this->swap('c');
+
     this->reset('a');
     this->reset('b');
-    this->getMemory(0);
-    this->swap('c');
-    this->store('c');
 
-    this->reset('a');
+    this->getMemory(a->getOffset());
+    this->load('a');
+
     this->reset('b');
+
+    this->sub('c');
     this->reset('c');
-    return this->data->getSymbol("$$");
+
+    this->jzero(3);
+    this->jpos(2);
+    long long start = this->k;
+    this->jump();
+
+    this->reset('a');
+    return new Cond(start, this->data->getSymbol("$$"));
+}
+
+void Code::ifBlock(Cond* cond) {
+    this->code[cond->start] += " " + to_string(this->k - cond->start) + "\n";
+    this->reset('a');
 }
 
 void Code::incLoop(long long) {
@@ -584,7 +534,9 @@ void Code::getValue(long long value) {
 }
 
 string Code::getCode() {
-    return this->code;
+    string code = "";
+    for (string command : this->code) code += command;
+    return code;
 }
 
 Symbol* Code::getSymbol(string id) {

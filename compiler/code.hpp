@@ -1,10 +1,11 @@
+#include <vector>
 #include "data.hpp"
 using namespace std;
 
 class Code {
 public:
     long long k;
-    string code;
+    vector<string> code;
     Data* data;
 
     Code(Data*);
@@ -24,6 +25,7 @@ public:
     void reset(char);
     void inc(char);
     void dec(char);
+    void jump();
     void jump(long long);
     void jpos(long long);
     void jzero(long long);
@@ -38,12 +40,14 @@ public:
     Symbol* times(Symbol*, Symbol*);
     Symbol* div(Symbol*, Symbol*);
     Symbol* mod(Symbol*, Symbol*);
-    Symbol* eq(Symbol*, Symbol*);
-    Symbol* neq(Symbol*, Symbol*);
-    Symbol* le(Symbol*, Symbol*);
-    Symbol* ge(Symbol*, Symbol*);
-    Symbol* leq(Symbol*, Symbol*);
-    Symbol* geq(Symbol*, Symbol*);
+    Cond* eq(Symbol*, Symbol*);
+    Cond* neq(Symbol*, Symbol*);
+    Cond* le(Symbol*, Symbol*);
+    Cond* ge(Symbol*, Symbol*);
+    Cond* leq(Symbol*, Symbol*);
+    Cond* geq(Symbol*, Symbol*);
+
+    void ifBlock(Cond*);
 
     Symbol* getSymbol(string);
     Symbol* getSymbol(string, string);

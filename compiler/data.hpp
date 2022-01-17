@@ -17,3 +17,13 @@ public:
     Symbol* getSymbol(string);
     Symbol* getSymbol(string, long long);
 };
+
+struct Cond {
+    long long start;
+    Symbol* symbol;
+
+    Cond(long long start, Symbol* symbol) {
+        this->start = start;
+        this->symbol = symbol;
+    }
+};
