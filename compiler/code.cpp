@@ -344,6 +344,7 @@ Symbol* Code::mod(Symbol* a, Symbol* b) {
 }
 
 Cond* Code::eq(Symbol* a, Symbol* b) {
+    long long jumpTo = this->k;
     this->getMemory(b->getOffset());
     this->load('a');
     this->swap('c');
@@ -364,10 +365,11 @@ Cond* Code::eq(Symbol* a, Symbol* b) {
     this->jump();
 
     this->reset('a');
-    return new Cond(start, this->data->getSymbol("$$"));
+    return new Cond(start, jumpTo);
 }
 
 Cond* Code::neq(Symbol* a, Symbol* b) {
+    long long jumpTo = this->k;
     this->getMemory(b->getOffset());
     this->load('a');
     this->swap('c');
@@ -389,10 +391,11 @@ Cond* Code::neq(Symbol* a, Symbol* b) {
     this->jump();
 
     this->reset('a');
-    return new Cond(start, this->data->getSymbol("$$"));
+    return new Cond(start, jumpTo);
 }
 
 Cond* Code::le(Symbol* a, Symbol* b) {
+    long long jumpTo = this->k;
     this->getMemory(b->getOffset());
     this->load('a');
     this->swap('c');
@@ -413,10 +416,11 @@ Cond* Code::le(Symbol* a, Symbol* b) {
     this->jump();
 
     this->reset('a');
-    return new Cond(start, this->data->getSymbol("$$"));
+    return new Cond(start, jumpTo);
 }
 
 Cond* Code::ge(Symbol* a, Symbol* b) {
+    long long jumpTo = this->k;
     this->getMemory(b->getOffset());
     this->load('a');
     this->swap('c');
@@ -437,10 +441,11 @@ Cond* Code::ge(Symbol* a, Symbol* b) {
     this->jump();
 
     this->reset('a');
-    return new Cond(start, this->data->getSymbol("$$"));
+    return new Cond(start, jumpTo);
 }
 
 Cond* Code::leq(Symbol* a, Symbol* b) {
+    long long jumpTo = this->k;
     this->getMemory(b->getOffset());
     this->load('a');
     this->swap('c');
@@ -462,10 +467,11 @@ Cond* Code::leq(Symbol* a, Symbol* b) {
     this->jump();
 
     this->reset('a');
-    return new Cond(start, this->data->getSymbol("$$"));
+    return new Cond(start, jumpTo);
 }
 
 Cond* Code::geq(Symbol* a, Symbol* b) {
+    long long jumpTo = this->k;
     this->getMemory(b->getOffset());
     this->load('a');
     this->swap('c');
@@ -487,7 +493,7 @@ Cond* Code::geq(Symbol* a, Symbol* b) {
     this->jump();
 
     this->reset('a');
-    return new Cond(start, this->data->getSymbol("$$"));
+    return new Cond(start, jumpTo);
 }
 
 void Code::ifBlock(Cond* cond) {
@@ -495,15 +501,21 @@ void Code::ifBlock(Cond* cond) {
     this->reset('a');
 }
 
-void Code::incLoop(long long) {
-
+void Code::ifElseFirstBlock(Cond* cond) {
+    long long start = this->k;
+    this->jump();
+    this->ifBlock(cond);
+    cond->start = start;
 }
 
-void Code::decLoop(long long) {
-
+void Code::whileBlock(Cond* cond) {
+    this->jump(cond->jumpTo - this->k);
+    this->code[cond->start] += " " + to_string(this->k - cond->start) + "\n";
+    this->reset('a');
 }
 
 void Code::getMemory(long long offset) {
+    if (offset == 0) return;
     long long temp = offset;
     long long memory = 0;
 

@@ -20,10 +20,10 @@ public:
 
 struct Cond {
     long long start;
-    Symbol* symbol;
+    long long jumpTo;
 
-    Cond(long long start, Symbol* symbol) {
+    Cond(long long start, long long jumpTo) {
         this->start = start;
-        this->symbol = symbol;
+        this->jumpTo = jumpTo;
     }
 };

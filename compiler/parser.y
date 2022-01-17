@@ -64,9 +64,10 @@ commands:       commands command
 ;
 
 command:        identifier ASSIGN expression ';'                                        { _code->assign($1, $3); }
-                | IF condition THEN commands ELSE commands ENDIF                        {;}
+                | IF condition THEN commands                                            { _code->ifElseFirstBlock($2); }
+                  ELSE commands ENDIF                                                   { _code->ifBlock($2); }
                 | IF condition THEN commands ENDIF                                      { _code->ifBlock($2); }
-                | WHILE condition DO commands ENDWHILE                                  {;}
+                | WHILE condition DO commands ENDWHILE                                  { _code->whileBlock($2); }
                 | REPEAT commands UNTIL condition ';'                                   {;}
                 | FOR pidentifier FROM value TO value DO commands ENDFOR                {;}
                 | FOR pidentifier FROM value DOWNTO value DO commands ENDFOR            {;}

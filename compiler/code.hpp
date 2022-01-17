@@ -48,6 +48,8 @@ public:
     Cond* geq(Symbol*, Symbol*);
 
     void ifBlock(Cond*);
+    void ifElseFirstBlock(Cond*);
+    void whileBlock(Cond*);
 
     Symbol* getSymbol(string);
     Symbol* getSymbol(string, string);
@@ -55,7 +57,5 @@ public:
     Symbol* getNumber(long long);
     void getMemory(long long);
     void getValue(long long);
-    void incLoop(long long);
-    void decLoop(long long);
     string getCode();
 };
