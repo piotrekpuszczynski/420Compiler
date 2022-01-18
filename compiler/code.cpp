@@ -510,8 +510,27 @@ void Code::ifElseFirstBlock(Cond* cond) {
 
 void Code::whileBlock(Cond* cond) {
     this->jump(cond->jumpTo - this->k);
-    this->code[cond->start] += " " + to_string(this->k - cond->start) + "\n";
-    this->reset('a');
+    this->ifBlock(cond);
+}
+
+void Code::repeatUntilStart() {
+    this->code.back() += "start";
+}
+
+void Code::repeatUntilBlock(Cond* cond) {
+    long long jumpTo = 0;
+    
+    while (true) {
+        jumpTo++;
+        string start = "start";
+        if (equal(start.rbegin(), start.rend(), code[code.size() - jumpTo].rbegin())) {
+            code[code.size() - jumpTo] = code[code.size() - jumpTo].substr(0, code[code.size() - jumpTo].size() - 5);
+            break;
+        }
+    }
+
+    this->jump(-jumpTo);
+    this->ifBlock(cond);
 }
 
 void Code::getMemory(long long offset) {

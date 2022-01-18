@@ -68,7 +68,8 @@ command:        identifier ASSIGN expression ';'                                
                   ELSE commands ENDIF                                                   { _code->ifBlock($2); }
                 | IF condition THEN commands ENDIF                                      { _code->ifBlock($2); }
                 | WHILE condition DO commands ENDWHILE                                  { _code->whileBlock($2); }
-                | REPEAT commands UNTIL condition ';'                                   {;}
+                | REPEAT                                                                { _code->repeatUntilStart(); }
+                  commands UNTIL condition ';'                                          { _code->repeatUntilBlock($5); }
                 | FOR pidentifier FROM value TO value DO commands ENDFOR                {;}
                 | FOR pidentifier FROM value DOWNTO value DO commands ENDFOR            {;}
                 | READ identifier ';'                                                   { _code->read($2); }

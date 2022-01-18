@@ -50,6 +50,8 @@ public:
     void ifBlock(Cond*);
     void ifElseFirstBlock(Cond*);
     void whileBlock(Cond*);
+    void repeatUntilStart();
+    void repeatUntilBlock(Cond*);
 
     Symbol* getSymbol(string);
     Symbol* getSymbol(string, string);
