@@ -514,7 +514,7 @@ void Code::whileBlock(Cond* cond) {
 }
 
 void Code::repeatUntilStart() {
-    this->code.back() += "start";
+    this->code.back() += "repeat";
 }
 
 void Code::repeatUntilBlock(Cond* cond) {
@@ -522,15 +522,103 @@ void Code::repeatUntilBlock(Cond* cond) {
     
     while (true) {
         jumpTo++;
-        string start = "start";
-        if (equal(start.rbegin(), start.rend(), code[code.size() - jumpTo].rbegin())) {
-            code[code.size() - jumpTo] = code[code.size() - jumpTo].substr(0, code[code.size() - jumpTo].size() - 5);
+        string s = "repeat";
+        if (equal(s.rbegin(), s.rend(), code[code.size() - jumpTo].rbegin())) {
+            code[code.size() - jumpTo] = code[code.size() - jumpTo].substr(0, code[code.size() - jumpTo].size() - 6);
             break;
         }
     }
 
     this->jump(-jumpTo);
     this->ifBlock(cond);
+}
+
+void Code::incForLoopCondition(string i, Symbol* a, Symbol* b) {
+    this->data->declareVariable(i);
+    this->assign(this->data->getSymbol(i), a);
+    Cond* cond = this->leq(this->data->getSymbol(i), b);
+    this->code[cond->jumpTo] += "jumpto";
+    this->code[cond->start] += "start";
+    delete cond;
+}
+
+void Code::decForLoopCondition(string i, Symbol* a, Symbol* b) {
+    this->data->declareVariable(i);
+    this->assign(this->data->getSymbol(i), a);
+    Cond* cond = this->geq(this->data->getSymbol(i), b);
+    this->code[cond->jumpTo - 1] += "jumpto";
+    this->code[cond->start] += "start";
+    delete cond;
+}
+
+void Code::incForLoopEnd(string val) {
+    long long jumpTo = 0;
+    long long start = 0;
+
+    this->getMemory(this->data->getSymbol(val)->getOffset());
+    this->swap('b');
+    this->load('b');
+    this->inc('a');
+    this->store('b');
+    this->reset('a');
+    this->reset('b');
+
+    while (true) {
+        jumpTo++;
+        string s = "jumpto";
+        if (equal(s.rbegin(), s.rend(), code[code.size() - jumpTo].rbegin())) {
+            code[code.size() - jumpTo] = code[code.size() - jumpTo].substr(0, code[code.size() - jumpTo].size() - 6);
+            break;
+        }
+    }
+
+    while (true) {
+        start++;
+        string s = "start";
+        if (equal(s.rbegin(), s.rend(), code[code.size() - start].rbegin())) {
+            code[code.size() - start] = code[code.size() - start].substr(0, code[code.size() - start].size() - 5);
+            break;
+        }
+    }
+
+    this->jump(-jumpTo);
+    this->code[this->k - start - 1] += " " + to_string(start + 1) + "\n";
+    this->reset('a');
+}
+
+void Code::decForLoopEnd(string val) {
+    long long jumpTo = 0;
+    long long start = 0;
+    
+    this->getMemory(this->data->getSymbol(val)->getOffset());
+    this->swap('b');
+    this->load('b');
+    this->dec('a');
+    this->store('b');
+    this->reset('a');
+    this->reset('b');
+
+    while (true) {
+        jumpTo++;
+        string s = "jumpto";
+        if (equal(s.rbegin(), s.rend(), code[code.size() - jumpTo].rbegin())) {
+            code[code.size() - jumpTo] = code[code.size() - jumpTo].substr(0, code[code.size() - jumpTo].size() - 6);
+            break;
+        }
+    }
+
+    while (true) {
+        start++;
+        string s = "start";
+        if (equal(s.rbegin(), s.rend(), code[code.size() - start].rbegin())) {
+            code[code.size() - start] = code[code.size() - start].substr(0, code[code.size() - start].size() - 5);
+            break;
+        }
+    }
+
+    this->jump(-jumpTo);
+    this->code[this->k - start - 1] += " " + to_string(start + 1) + "\n";
+    this->reset('a');
 }
 
 void Code::getMemory(long long offset) {

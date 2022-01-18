@@ -70,8 +70,10 @@ command:        identifier ASSIGN expression ';'                                
                 | WHILE condition DO commands ENDWHILE                                  { _code->whileBlock($2); }
                 | REPEAT                                                                { _code->repeatUntilStart(); }
                   commands UNTIL condition ';'                                          { _code->repeatUntilBlock($5); }
-                | FOR pidentifier FROM value TO value DO commands ENDFOR                {;}
-                | FOR pidentifier FROM value DOWNTO value DO commands ENDFOR            {;}
+                | FOR pidentifier FROM value TO value DO                                { _code->incForLoopCondition(*$2, $4, $6); }
+                  commands ENDFOR                                                       { _code->incForLoopEnd(*$2); }
+                | FOR pidentifier FROM value DOWNTO value DO                            { _code->decForLoopCondition(*$2, $4, $6); }
+                  commands ENDFOR                                                       { _code->decForLoopEnd(*$2); }
                 | READ identifier ';'                                                   { _code->read($2); }
                 | WRITE value ';'                                                       { _code->write($2); }
 ;

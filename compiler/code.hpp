@@ -35,6 +35,15 @@ public:
     void read(Symbol*);
     void write(Symbol*);
     void assign(Symbol*, Symbol*);
+    void ifBlock(Cond*);
+    void ifElseFirstBlock(Cond*);
+    void whileBlock(Cond*);
+    void repeatUntilStart();
+    void repeatUntilBlock(Cond*);
+    void incForLoopCondition(string, Symbol*, Symbol*);
+    void decForLoopCondition(string, Symbol*, Symbol*);
+    void incForLoopEnd(string);
+    void decForLoopEnd(string);
     Symbol* plus(Symbol*, Symbol*);
     Symbol* minus(Symbol*, Symbol*);
     Symbol* times(Symbol*, Symbol*);
@@ -46,12 +55,6 @@ public:
     Cond* ge(Symbol*, Symbol*);
     Cond* leq(Symbol*, Symbol*);
     Cond* geq(Symbol*, Symbol*);
-
-    void ifBlock(Cond*);
-    void ifElseFirstBlock(Cond*);
-    void whileBlock(Cond*);
-    void repeatUntilStart();
-    void repeatUntilBlock(Cond*);
 
     Symbol* getSymbol(string);
     Symbol* getSymbol(string, string);
