@@ -1,6 +1,4 @@
-#include <string>
 #include "data.hpp"
-using namespace std;
 
 Data::Data() {
     this->offset = 0;

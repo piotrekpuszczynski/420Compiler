@@ -1,6 +1,5 @@
 #include <vector>
 #include "data.hpp"
-using namespace std;
 
 class Code {
 public:
@@ -8,7 +7,7 @@ public:
     vector<string> code;
     Data* data;
 
-    Code(Data*);
+    Code();
 
     void atomic(string);
     void atomic(string, long long);

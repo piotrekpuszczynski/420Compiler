@@ -1,8 +1,6 @@
 %{
 #include <iostream>
-#include <string>
 #include "code.hpp"
-using namespace std;
 
 int yylex();
 int yyerror(string);
@@ -10,8 +8,7 @@ void yyset_in(FILE*);
 
 extern int yylineno;
 
-Data* _data = new Data();
-Code* _code = new Code(_data);
+Code* _code = new Code();
 %}
 
 %code requires {
@@ -53,10 +50,10 @@ program:        VAR declarations TBEGIN commands END                            
                 | TBEGIN commands END                                                   { _code->halt(); }
 ;
 
-declarations:   declarations ',' pidentifier                                            { _data->declareVariable(*$3, Type::variable); }
-                | declarations ',' pidentifier '[' number ':' number ']'                { _data->declareArray(*$3, $5, $7); }
-                | pidentifier                                                           { _data->declareVariable(*$1, Type::variable); }
-                | pidentifier '[' number ':' number ']'                                 { _data->declareArray(*$1, $3, $5); }
+declarations:   declarations ',' pidentifier                                            { _code->declareVariable(*$3, Type::variable); }
+                | declarations ',' pidentifier '[' number ':' number ']'                { _code->declareArray(*$3, $5, $7); }
+                | pidentifier                                                           { _code->declareVariable(*$1, Type::variable); }
+                | pidentifier '[' number ':' number ']'                                 { _code->declareArray(*$1, $3, $5); }
 ;
 
 commands:       commands command

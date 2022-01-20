@@ -1,12 +1,9 @@
-#include <string>
 #include <cmath>
 #include "code.hpp"
-#include "data.hpp"
-using namespace std;
 
-Code::Code(Data* data) {
+Code::Code() {
     this->k = 0;
-    this->data = data;
+    this->data = new Data();
     this->reset('a');
     this->reset('b');
     this->reset('c');
@@ -160,7 +157,7 @@ Symbol* Code::plus(Symbol* a, Symbol* b) {
     this->reset('a');
     this->reset('b');
     this->reset('c');
-    return getSymbol("$$");
+    return this->getSymbol("$$");
 }
 
 Symbol* Code::minus(Symbol* a, Symbol* b) {
@@ -187,7 +184,7 @@ Symbol* Code::minus(Symbol* a, Symbol* b) {
     this->reset('a');
     this->reset('b');
     this->reset('c');
-    return getSymbol("$$");
+    return this->getSymbol("$$");
 }
 
 Symbol* Code::times(Symbol* a, Symbol* b) {
@@ -232,7 +229,7 @@ Symbol* Code::times(Symbol* a, Symbol* b) {
     this->reset('b');
     // this->reset('c');
 
-    return getSymbol("$$");
+    return this->getSymbol("$$");
 }
 
 Symbol* Code::div(Symbol* a, Symbol* b) {
@@ -283,7 +280,7 @@ Symbol* Code::div(Symbol* a, Symbol* b) {
     this->reset('b');
     this->reset('c');
 
-    return getSymbol("$$");
+    return this->getSymbol("$$");
 }
 
 Symbol* Code::mod(Symbol* a, Symbol* b) {
@@ -337,7 +334,7 @@ Symbol* Code::mod(Symbol* a, Symbol* b) {
     this->reset('a');
     this->reset('b');
     this->reset('c');
-    return getSymbol("$$");
+    return this->getSymbol("$$");
 }
 
 Cond* Code::eq(Symbol* a, Symbol* b) {
@@ -657,26 +654,26 @@ void Code::genValue(long long value) {
 }
 
 void Code::declareVariable(string id, Type type) {
-    data->declareVariable(id, type);
+    this->data->declareVariable(id, type);
 }
 
 void Code::declareArray(string id, long long start, long long end) {
-    data->declareArray(id, start, end);
+    this->data->declareArray(id, start, end);
 }
 
 bool Code::isDeclared(string id) {
-    return data->isDeclared(id);
+    return this->data->isDeclared(id);
 }
 
 Symbol* Code::getSymbol(string id) {
-    return data->getSymbol(id);
+    return this->data->getSymbol(id);
 }
 
 Symbol* Code::getSymbol(string arr, string index) {
-    Array* array = reinterpret_cast<Array*>(getSymbol(arr));
-    Symbol* indexSymbol = getSymbol(index);
+    Array* array = reinterpret_cast<Array*>(this->getSymbol(arr));
+    Symbol* indexSymbol = this->getSymbol(index);
 
-    this->genOffset(getNumber(array->start)->getOffset());
+    this->genOffset(this->getNumber(array->start)->getOffset());
     this->load('a');
     this->swap('c');
     this->reset('b');
@@ -697,8 +694,8 @@ Symbol* Code::getSymbol(string arr, string index) {
     this->reset('a');
     this->reset('b');
     string name = arr + "[" + index + "]";
-    this->data->declareVariable(name, Type::pointer);
-    this->genOffset(getSymbol(name)->getOffset());
+    this->declareVariable(name, Type::pointer);
+    this->genOffset(this->getSymbol(name)->getOffset());
     this->swap('c');
     this->store('c');
 
@@ -706,20 +703,20 @@ Symbol* Code::getSymbol(string arr, string index) {
     this->reset('b');
     this->reset('c');
 
-    return getSymbol(name);
+    return this->getSymbol(name);
 }
 
 Symbol* Code::getSymbol(string id, long long index) {
-    return data->getSymbol(id, index);
+    return this->data->getSymbol(id, index);
 }
 
 Symbol* Code::getNumber(long long value) {
     string asString = to_string(value);
-    if (isDeclared(asString))
-        return getSymbol(asString);
+    if (this->isDeclared(asString))
+        return this->getSymbol(asString);
 
-    this->data->declareVariable(asString, Type::constant);
-    Symbol* var = getSymbol(asString);
+    this->declareVariable(asString, Type::constant);
+    Symbol* var = this->getSymbol(asString);
 
     this->genOffset(var->getOffset());
     this->swap('c');

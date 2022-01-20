@@ -3,10 +3,7 @@
 %option nounput
 
 %{
-#include <iostream>
-#include <string>
 #include "parser.hpp"
-using namespace std;
 %}
 
 %x comment
