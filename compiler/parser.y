@@ -53,9 +53,9 @@ program:        VAR declarations TBEGIN commands END                            
                 | TBEGIN commands END                                                   { _code->halt(); }
 ;
 
-declarations:   declarations ',' pidentifier                                            { _data->declareVariable(*$3); }
+declarations:   declarations ',' pidentifier                                            { _data->declareVariable(*$3, Type::variable); }
                 | declarations ',' pidentifier '[' number ':' number ']'                { _data->declareArray(*$3, $5, $7); }
-                | pidentifier                                                           { _data->declareVariable(*$1); }
+                | pidentifier                                                           { _data->declareVariable(*$1, Type::variable); }
                 | pidentifier '[' number ':' number ']'                                 { _data->declareArray(*$1, $3, $5); }
 ;
 

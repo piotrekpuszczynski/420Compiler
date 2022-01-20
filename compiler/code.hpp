@@ -41,8 +41,8 @@ public:
     void repeatUntilStart();
     void repeatUntilBlock(Cond*);
     void incForLoopCondition(string, Symbol*, Symbol*);
-    void decForLoopCondition(string, Symbol*, Symbol*);
     void incForLoopEnd(string);
+    void decForLoopCondition(string, Symbol*, Symbol*);
     void decForLoopEnd(string);
     Symbol* plus(Symbol*, Symbol*);
     Symbol* minus(Symbol*, Symbol*);
@@ -56,11 +56,15 @@ public:
     Cond* leq(Symbol*, Symbol*);
     Cond* geq(Symbol*, Symbol*);
 
+    void declareVariable(string, Type);
+    void declareArray(string, long long, long long);
+    bool isDeclared(string);
     Symbol* getSymbol(string);
     Symbol* getSymbol(string, string);
     Symbol* getSymbol(string, long long);
     Symbol* getNumber(long long);
-    void getMemory(long long);
-    void getValue(long long);
+    void getSymbolOffset(Symbol*);
+    void genOffset(long long);
+    void genValue(long long);
     string getCode();
 };

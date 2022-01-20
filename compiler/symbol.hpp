@@ -1,10 +1,20 @@
 #pragma once
 
+enum class Type {
+    calc,
+    variable,
+    array,
+    pointer,
+    iterator,
+    constant
+};
+
 class Symbol {
 public:
     long long offset;
+    Type type;
 
-    Symbol(long long);
+    Symbol(long long, Type);
     long long getOffset();
     virtual Symbol* getSymbol(long long) = 0;
 };

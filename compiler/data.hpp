@@ -11,7 +11,7 @@ public:
     unordered_map<string, Symbol*> variables;
 
     Data();
-    void declareVariable(string);
+    void declareVariable(string, Type);
     void declareArray(string, long long, long long);
     bool isDeclared(string);
     Symbol* getSymbol(string);

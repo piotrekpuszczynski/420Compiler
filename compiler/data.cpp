@@ -1,4 +1,3 @@
-#include <iostream>
 #include <string>
 #include "data.hpp"
 using namespace std;
@@ -8,9 +7,9 @@ Data::Data() {
 }
 
 // TODO exception if variable is already defined
-void Data::declareVariable(string id) {
+void Data::declareVariable(string id, Type type) {
     if (!this->isDeclared(id)) {
-        this->variables[id] = new Variable(this->offset);
+        this->variables[id] = new Variable(this->offset, type);
         this->offset++;
     }
 }
