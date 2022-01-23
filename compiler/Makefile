@@ -2,10 +2,10 @@ CC = g++
 FLAGS = -W -Wall -pedantic -std=c++17 -O3
 FILES = parser.o lexer.o data.o symbol.o code.o main.o
 
-all: compiler clean
+all: compiler
 
 compiler: $(FILES)
-	$(CC) $(FLAGS) -o compiler $(FILES)
+	$(CC) -o compiler $(FILES)
 
 %.o: %.cpp
 	$(CC) $(FLAGS) -c $^

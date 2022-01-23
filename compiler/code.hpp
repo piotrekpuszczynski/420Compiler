@@ -58,10 +58,12 @@ public:
     void declareVariable(string, Type);
     void declareArray(string, long long, long long);
     bool isDeclared(string);
+    Symbol* getPointer(string);
     Symbol* getSymbol(string);
     Symbol* getSymbol(string, string);
     Symbol* getSymbol(string, long long);
     Symbol* getNumber(long long);
+    void loadSymbols(Symbol*, Symbol*);
     void getSymbolOffset(Symbol*);
     void genOffset(long long);
     void genValue(long long);

@@ -20,10 +20,14 @@ public:
 };
 
 class Variable : public Symbol {
+    bool initialized;
 public:
+    Variable(long long, Type);
     using Symbol::Symbol;
     using Symbol::getOffset;
     Symbol* getSymbol(long long);
+    bool isInitialized();
+    void isInitialized(bool);
 };
 
 class Array : public Symbol {

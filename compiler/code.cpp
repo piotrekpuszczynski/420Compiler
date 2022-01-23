@@ -1,6 +1,8 @@
 #include <cmath>
 #include "code.hpp"
 
+extern int yyerror(string);
+
 Code::Code() {
     this->k = 0;
     this->data = new Data();
@@ -99,10 +101,12 @@ void Code::halt() {
 }
 
 void Code::assign(Symbol* id, Symbol* exp) {
+    if (!dynamic_cast<Variable*>(exp)->isInitialized())
+        yyerror("use of uninitialized variable");
+    dynamic_cast<Variable*>(id)->isInitialized(true);
     this->getSymbolOffset(id);
     this->swap('c');
 
-    this->reset('a');
     this->reset('b');
 
     this->getSymbolOffset(exp);
@@ -115,6 +119,7 @@ void Code::assign(Symbol* id, Symbol* exp) {
 }
 
 void Code::read(Symbol* var) {
+    dynamic_cast<Variable*>(var)->isInitialized(true);
     this->getSymbolOffset(var);
     this->swap('b');
     this->get();
@@ -125,6 +130,8 @@ void Code::read(Symbol* var) {
 }
 
 void Code::write(Symbol* var) {
+    if (!dynamic_cast<Variable*>(var)->isInitialized())
+        yyerror("use of uninitialized variable");
     this->getSymbolOffset(var);
     this->load('a');
     this->put();
@@ -134,23 +141,14 @@ void Code::write(Symbol* var) {
 }
 
 Symbol* Code::plus(Symbol* a, Symbol* b) {
-    this->getSymbolOffset(a);
-    this->load('a');
-    this->swap('c');
-
-    this->reset('a');
-    this->reset('b');
-
-    this->getSymbolOffset(b);
-    this->load('a');
+    this->loadSymbols(b, a);
+    
     this->add('c');
 
     this->swap('c');
 
     this->reset('a');
-    // this->reset('b');
 
-    // this->getOffset(0);
     this->swap('c');
     this->store('c');
 
@@ -161,23 +159,14 @@ Symbol* Code::plus(Symbol* a, Symbol* b) {
 }
 
 Symbol* Code::minus(Symbol* a, Symbol* b) {
-    this->getSymbolOffset(b);
-    this->load('a');
-    this->swap('c');
+    this->loadSymbols(b, a);
 
-    this->reset('a');
-    this->reset('b');
-
-    this->getSymbolOffset(a);
-    this->load('a');
     this->sub('c');
 
     this->swap('c');
 
     this->reset('a');
-    // this->reset('b');
 
-    // this->genOffset(0);
     this->swap('c');
     this->store('c');
 
@@ -188,17 +177,7 @@ Symbol* Code::minus(Symbol* a, Symbol* b) {
 }
 
 Symbol* Code::times(Symbol* a, Symbol* b) {
-    this->getSymbolOffset(b);
-    this->load('a');
-    this->swap('c');
-
-    this->reset('a');
-    this->reset('b');
-
-    this->getSymbolOffset(a);
-    this->load('a');
-
-    this->reset('b');
+    this->loadSymbols(b, a);
 
     this->jzero(15);
 
@@ -219,31 +198,17 @@ Symbol* Code::times(Symbol* a, Symbol* b) {
     this->jump(-5);
 
     this->swap('b');
-    // this->swap('c');
     this->reset('c');
-    // this->genOffset(0);
-    // this->swap('c');
     this->store('c');
 
     this->reset('a');
     this->reset('b');
-    // this->reset('c');
 
     return this->getSymbol("$$");
 }
 
 Symbol* Code::div(Symbol* a, Symbol* b) {
-    this->getSymbolOffset(a);
-    this->load('a');
-    this->swap('c');
-
-    this->reset('a');
-    this->reset('b');
-
-    this->getSymbolOffset(b);
-    this->load('a');
-
-    this->reset('b');
+    this->loadSymbols(b, a);
 
     this->jzero(18);
 
@@ -284,17 +249,7 @@ Symbol* Code::div(Symbol* a, Symbol* b) {
 }
 
 Symbol* Code::mod(Symbol* a, Symbol* b) {
-    this->getSymbolOffset(a);
-    this->load('a');
-    this->swap('c');
-
-    this->reset('a');
-    this->reset('b');
-
-    this->getSymbolOffset(b);
-    this->load('a');
-
-    this->reset('b');
+    this->loadSymbols(b, a);
 
     this->jzero(19);
 
@@ -338,24 +293,14 @@ Symbol* Code::mod(Symbol* a, Symbol* b) {
 }
 
 Cond* Code::eq(Symbol* a, Symbol* b) {
-    long long jumpTo = this->k;
-    this->getSymbolOffset(b);
-    this->load('a');
-    this->swap('c');
-
-    this->reset('a');
-    this->reset('b');
-
-    this->getSymbolOffset(a);
-    this->load('a');
-
-    this->reset('b');
+    long long jumpTo = this->k, start;
+    this->loadSymbols(b, a);
 
     this->sub('c');
     this->reset('c');
 
     this->jzero(2);
-    long long start = this->k;
+    start = this->k;
     this->jump();
 
     this->reset('a');
@@ -363,25 +308,15 @@ Cond* Code::eq(Symbol* a, Symbol* b) {
 }
 
 Cond* Code::neq(Symbol* a, Symbol* b) {
-    long long jumpTo = this->k;
-    this->getSymbolOffset(b);
-    this->load('a');
-    this->swap('c');
-
-    this->reset('a');
-    this->reset('b');
-
-    this->getSymbolOffset(a);
-    this->load('a');
-
-    this->reset('b');
+    long long jumpTo = this->k, start;
+    this->loadSymbols(b, a);
 
     this->sub('c');
     this->reset('c');
 
     this->jzero(2);
     this->jump(2);
-    long long start = this->k;
+    start = this->k;
     this->jump();
 
     this->reset('a');
@@ -389,24 +324,14 @@ Cond* Code::neq(Symbol* a, Symbol* b) {
 }
 
 Cond* Code::le(Symbol* a, Symbol* b) {
-    long long jumpTo = this->k;
-    this->getSymbolOffset(b);
-    this->load('a');
-    this->swap('c');
-
-    this->reset('a');
-    this->reset('b');
-
-    this->getSymbolOffset(a);
-    this->load('a');
-
-    this->reset('b');
+    long long jumpTo = this->k, start;
+    this->loadSymbols(b, a);
 
     this->sub('c');
     this->reset('c');
 
     this->jneg(2);
-    long long start = this->k;
+    start = this->k;
     this->jump();
 
     this->reset('a');
@@ -414,24 +339,14 @@ Cond* Code::le(Symbol* a, Symbol* b) {
 }
 
 Cond* Code::ge(Symbol* a, Symbol* b) {
-    long long jumpTo = this->k;
-    this->getSymbolOffset(b);
-    this->load('a');
-    this->swap('c');
-
-    this->reset('a');
-    this->reset('b');
-
-    this->getSymbolOffset(a);
-    this->load('a');
-
-    this->reset('b');
+    long long jumpTo = this->k, start;
+    this->loadSymbols(b, a);
 
     this->sub('c');
     this->reset('c');
 
     this->jpos(2);
-    long long start = this->k;
+    start = this->k;
     this->jump();
 
     this->reset('a');
@@ -439,25 +354,15 @@ Cond* Code::ge(Symbol* a, Symbol* b) {
 }
 
 Cond* Code::leq(Symbol* a, Symbol* b) {
-    long long jumpTo = this->k;
-    this->getSymbolOffset(b);
-    this->load('a');
-    this->swap('c');
-
-    this->reset('a');
-    this->reset('b');
-
-    this->getSymbolOffset(a);
-    this->load('a');
-
-    this->reset('b');
+    long long jumpTo = this->k, start;
+    this->loadSymbols(b, a);
 
     this->sub('c');
     this->reset('c');
 
     this->jzero(3);
     this->jneg(2);
-    long long start = this->k;
+    start = this->k;
     this->jump();
 
     this->reset('a');
@@ -465,25 +370,15 @@ Cond* Code::leq(Symbol* a, Symbol* b) {
 }
 
 Cond* Code::geq(Symbol* a, Symbol* b) {
-    long long jumpTo = this->k;
-    this->getSymbolOffset(b);
-    this->load('a');
-    this->swap('c');
-
-    this->reset('a');
-    this->reset('b');
-
-    this->getSymbolOffset(a);
-    this->load('a');
-
-    this->reset('b');
+    long long jumpTo = this->k, start;
+    this->loadSymbols(b, a);
 
     this->sub('c');
     this->reset('c');
 
     this->jzero(3);
     this->jpos(2);
-    long long start = this->k;
+    start = this->k;
     this->jump();
 
     this->reset('a');
@@ -528,28 +423,39 @@ void Code::repeatUntilBlock(Cond* cond) {
 }
 
 void Code::incForLoopCondition(string i, Symbol* a, Symbol* b) {
-    this->data->declareVariable(i, Type::iterator);
-    this->assign(getSymbol(i), a);
-    Cond* cond = this->leq(getSymbol(i), b);
+    this->declareVariable(i, Type::iterator);
+    this->assign(this->getSymbol(i), a);
+
+    string threshold = i + "-threshold";
+    this->declareVariable(threshold, Type::constant);
+    this->assign(this->getSymbol(threshold), b);
+    Cond* cond = this->leq(this->getSymbol(i), this->getSymbol(threshold));
+
     this->code[cond->jumpTo] += "jumpto";
     this->code[cond->start] += "start";
     delete cond;
 }
 
 void Code::decForLoopCondition(string i, Symbol* a, Symbol* b) {
-    this->data->declareVariable(i, Type::iterator);
-    this->assign(getSymbol(i), a);
-    Cond* cond = this->geq(getSymbol(i), b);
+    this->declareVariable(i, Type::iterator);
+    this->assign(this->getSymbol(i), a);
+    
+    string threshold = i + "-threshold";
+    this->declareVariable(threshold, Type::constant);
+    this->assign(this->getSymbol(threshold), b);
+    Cond* cond = this->geq(this->getSymbol(i), this->getSymbol(threshold));
+
     this->code[cond->jumpTo] += "jumpto";
     this->code[cond->start] += "start";
     delete cond;
 }
 
-void Code::incForLoopEnd(string val) {
+void Code::incForLoopEnd(string i) {
     long long jumpTo = 0;
     long long start = 0;
 
-    this->getSymbolOffset(getSymbol(val));
+    dynamic_cast<Variable*>(this->getSymbol(i))->isInitialized(false);
+    this->getSymbolOffset(this->getSymbol(i));
     this->swap('b');
     this->load('b');
     this->inc('a');
@@ -580,11 +486,12 @@ void Code::incForLoopEnd(string val) {
     this->reset('a');
 }
 
-void Code::decForLoopEnd(string val) {
+void Code::decForLoopEnd(string i) {
     long long jumpTo = 0;
     long long start = 0;
     
-    this->getSymbolOffset(getSymbol(val));
+    dynamic_cast<Variable*>(this->getSymbol(i))->isInitialized(false);
+    this->getSymbolOffset(this->getSymbol(i));
     this->swap('b');
     this->load('b');
     this->dec('a');
@@ -618,20 +525,43 @@ void Code::decForLoopEnd(string val) {
 void Code::genOffset(long long offset) {
     if (offset == 0) return;
     long long temp = offset;
-    long long memory = 0;
+    long long power = 0;
+    long long result = offset;
 
-    while (temp > 1) {
-        temp /= 2;
-        memory++;
-    }
-
-    temp = offset;
-    temp = temp - pow(2, memory);
-
-    for (int i = 0; i < memory; i++) this->inc('b');
     this->inc('a');
-    this->shift('b');
-    for (int i = 0; i < temp; i++) this->inc('a');
+    while (result > 5) {
+        temp = result;
+        power = 0;
+        while (temp > 1) {
+            temp /= 2;
+            power++;
+        }
+        result -= pow(2, power);
+        for (int i = 0; i < power; i++) this->inc('b');
+        this->shift('b');
+        this->reset('b');
+        this->swap('e');
+        this->add('e');
+        this->swap('e');
+        this->reset('a');
+        this->inc('a');
+    }
+    this->swap('e');
+    this->reset('e');
+    for (int i = 0; i < result; i++) this->inc('a');
+
+    // while (temp > 1) {
+    //     temp /= 2;
+    //     power++;
+    // }
+
+    // temp = offset;
+    // temp = temp - pow(2, power);
+
+    // for (int i = 0; i < power; i++) this->inc('b');
+    // this->inc('a');
+    // this->shift('b');
+    // for (int i = 0; i < temp; i++) this->inc('a');
 }
 
 void Code::getSymbolOffset(Symbol* symbol) {
@@ -650,6 +580,7 @@ void Code::genValue(long long value) {
     if (value != asAbs) {
         this->swap('b');
         this->sub('b');
+        this->reset('b');
     }
 }
 
@@ -665,6 +596,12 @@ bool Code::isDeclared(string id) {
     return this->data->isDeclared(id);
 }
 
+Symbol* Code::getPointer(string name) {
+    if (!this->isDeclared(name))
+        this->declareVariable(name, Type::pointer);
+    return this->getSymbol(name);
+}
+
 Symbol* Code::getSymbol(string id) {
     return this->data->getSymbol(id);
 }
@@ -673,29 +610,22 @@ Symbol* Code::getSymbol(string arr, string index) {
     Array* array = reinterpret_cast<Array*>(this->getSymbol(arr));
     Symbol* indexSymbol = this->getSymbol(index);
 
-    this->genOffset(this->getNumber(array->start)->getOffset());
-    this->load('a');
-    this->swap('c');
-    this->reset('b');
-
-    this->genOffset(indexSymbol->getOffset());
-    this->load('a');
+    this->loadSymbols(this->getNumber(array->start), indexSymbol);
+    
     this->sub('c');
     this->swap('c');
     this->reset('a');
-    this->reset('b');
 
     this->genOffset(array->getOffset());
     this->reset('b');
     this->add('c');
     
-
     this->swap('c');
     this->reset('a');
     this->reset('b');
-    string name = arr + "[" + index + "]";
-    this->declareVariable(name, Type::pointer);
-    this->genOffset(this->getSymbol(name)->getOffset());
+
+    Symbol* pointer = this->getPointer(arr + "[" + index + "]");
+    this->genOffset(pointer->getOffset());
     this->swap('c');
     this->store('c');
 
@@ -703,7 +633,7 @@ Symbol* Code::getSymbol(string arr, string index) {
     this->reset('b');
     this->reset('c');
 
-    return this->getSymbol(name);
+    return pointer;
 }
 
 Symbol* Code::getSymbol(string id, long long index) {
@@ -732,6 +662,20 @@ Symbol* Code::getNumber(long long value) {
     this->reset('c');
 
     return var;
+}
+
+void Code::loadSymbols(Symbol* a, Symbol* b) {
+    if (!dynamic_cast<Variable*>(a)->isInitialized() || !dynamic_cast<Variable*>(b)->isInitialized())
+        yyerror("use of uninitialized variable");
+    this->getSymbolOffset(a);
+    this->load('a');
+    this->swap('c');
+
+    this->reset('b');
+
+    this->getSymbolOffset(b);
+    this->load('a');
+    this->reset('b');
 }
 
 string Code::getCode() {
