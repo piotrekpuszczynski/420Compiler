@@ -77,7 +77,8 @@ void Code::dec(char x) {
 }
 
 void Code::jump() {
-    this->atomic("JUMP");
+    this->code.push_back("JUMP");
+    this->k++;
 }
 
 void Code::jump(long long j) {
@@ -177,32 +178,60 @@ Symbol* Code::minus(Symbol* a, Symbol* b) {
 }
 
 Symbol* Code::times(Symbol* a, Symbol* b) {
-    this->loadSymbols(b, a);
+    this->loadSymbols(a, b);
+    
+    this->inc('e');
+    this->dec('d');
 
-    this->jzero(15);
-
-    this->jneg(7);
-    this->dec('a');
-    this->swap('b');
+    // check a
+    this->jzero(7);
+    this->jpos(4);
+    this->dec('h');
+    this->swap('f');
+    this->sub('f');
+    this->swap('c');
+    this->swap('g');
+    this->swap('c');
+    
+    // check b
+    this->jzero(20);
+    this->swap('c');
+    this->reset('f');
+    this->swap('f');
+    
+    // parzystosc B
     this->add('c');
-    this->swap('b');
-    this->jzero(9);
-    this->jump(-5);
-
-    this->jpos(7);
-    this->inc('a');
-    this->swap('b');
+    this->shift('d');
+    this->shift('e');
     this->sub('c');
-    this->swap('b');
-    this->jzero(2);
-    this->jump(-5);
+    this->jzero(4);
+    this->swap('f');
+    this->add('g');
+    this->jump(2);
+    this->swap('f');
+    this->swap('g');
+    this->shift('e');
+    this->swap('g');
+    this->swap('c');
+    this->shift('d');
+    this->swap('c');
+    this->jump(-20);
+    this->swap('h');
+    this->jzero(4);
+    this->reset('a');
+    this->sub('c');
+    this->jump(2);
+    this->swap('c');
 
-    this->swap('b');
-    this->reset('c');
-    this->store('c');
+    this->store('b');
 
     this->reset('a');
-    this->reset('b');
+    this->reset('c');
+    this->reset('d');
+    this->reset('e');
+    this->reset('f');
+    this->reset('g');
+    this->reset('h');
 
     return this->getSymbol("$$");
 }
@@ -210,40 +239,126 @@ Symbol* Code::times(Symbol* a, Symbol* b) {
 Symbol* Code::div(Symbol* a, Symbol* b) {
     this->loadSymbols(b, a);
 
-    this->jzero(18);
-
-    this->swap('c');
-    this->jpos(4); // if a is neg changes it to pos
     this->swap('b');
-    this->sub('b');
-    this->reset('b');
+    this->swap('c');
 
-    this->swap('c');
-    this->jneg(6);
-    //b+
-    this->swap('c');
-    this->sub('c');
-    this->jneg(8);
-    this->inc('b');
+    this->inc('c');
+    this->dec('d');
+
+    this->jzero(66);
+    this->jpos(6);
+    this->inc('e');
+    this->inc('e');
+    this->swap('f');
+    this->sub('f');
+    this->reset('f');
+    this->swap('b');
+    this->jzero(58);
+    this->jpos(5);
+    this->inc('e');
+    this->swap('f');
+    this->sub('f');
+    this->reset('f');
+    // h = dlugosc bitowa a
+    this->swap('g');
+    this->add('g');
+    this->jzero(4);
+    this->shift('d');
+    this->inc('h');
     this->jump(-3);
-    //b-
-    this->swap('c');
-    this->add('c');
-    this->jneg(3);
+    this->swap('g');
+    // g dlugosc a wartosc
+    this->swap('b');
+    // g = dlugosc bitowa b
+    this->swap('f');
+    this->add('f');
+    this->jzero(4);
+    this->shift('d');
+    this->inc('g');
+    this->jump(-3);
+    this->swap('f');
+    this->swap('b');
+    this->swap('h');
+    // roznica dlugosci
+    this->sub('g');
+    this->jneg(35);
+    this->reset('f');
+    this->swap('f');
+    this->add('f');
+    this->swap('f');
+    this->inc('f');
+    // a roznica h g
+    // wyrownanie do lewej
+    this->jzero(6);
+    this->swap('b');
+    this->shift('c');
     this->dec('b');
-    this->jump(-3);
-
     this->swap('b');
-    this->swap('c');
-    this->reset('a');
-    this->reset('b');
-    this->genOffset(0);
-    this->swap('c');
+    this->jump(-5);
+    this->swap('h');
+    // a i wyrownane b
+    this->reset('h');
+    this->swap('f');
+    // petla
+    this->jzero(19);
+    this->reset('g');
+    this->swap('g');
+    this->add('f');
+    this->sub('b');
+    this->swap('h');
+    this->shift('c');
+    this->swap('h');
+    this->jneg(5);
+    this->inc('h');
+    this->swap('f');
+    this->sub('b');
+    this->swap('f');
+    this->swap('b');
+    this->shift('d');
+    this->swap('b');
+    this->swap('g');
+    this->dec('a');
+    this->jump(-18);
+    this->jump(6);
+    this->swap('h');
+    this->swap('f');
+    this->add('f');
+    this->swap('f');
+    this->reset('h');
+    this->swap('h');
+
+    // spr
+    this->swap('e');
+    this->jzero(16);
+    this->dec('a');
+    this->jzero(4);
+    this->dec('a');
+    this->jzero(2);
+    // dwa minusy
+    this->jump(11);
+    // jeden minus
+    this->reset('g');
+    this->swap('e');
+    this->swap('g');
+    this->sub('g');
+    this->swap('e');
+    this->swap('f');
+    this->jzero(4);
+    this->swap('e');
+    this->sub('c');
+    this->swap('e');
+    this->swap('e');
+    
+    this->reset('c');
     this->store('c');
 
     this->reset('a');
     this->reset('b');
-    this->reset('c');
+    this->reset('d');
+    this->reset('e');
+    this->reset('f');
+    this->reset('g');
+    this->reset('h');
 
     return this->getSymbol("$$");
 }
@@ -251,44 +366,137 @@ Symbol* Code::div(Symbol* a, Symbol* b) {
 Symbol* Code::mod(Symbol* a, Symbol* b) {
     this->loadSymbols(b, a);
 
-    this->jzero(19);
-
-    this->swap('c');
-    this->jpos(4);
     this->swap('b');
-    this->sub('b');
-    this->reset('b');
-
     this->swap('c');
-    this->jneg(7);
-
-    this->swap('c');
-    this->sub('c');
-    this->jneg(2);
-    this->jump(-2);
-
-    this->add('c');
-    this->jump(8);
+ 
+    this->dec('d');
 
     this->swap('c');
     this->add('c');
-    this->jneg(2);
-    this->jump(-2);
-
-    this->sub('c');
+    this->swap('c');
+    this->jzero(74);
+    this->jpos(6);
+    this->inc('e');
+    this->inc('e');
+    this->swap('f');
+    this->sub('f');
+    this->reset('f');
     this->swap('b');
+    this->jzero(66);
+    this->jpos(5);
+    this->inc('e');
+    this->swap('f');
+    this->sub('f');
+    this->reset('f');
+    // h = dlugosc bitowa a
+    this->swap('g');
+    this->add('g');
+    this->jzero(4);
+    this->shift('d');
+    this->inc('h');
+    this->jump(-3);
+    this->swap('g');
+    // g dlugosc a wartosc
+    this->swap('b');
+    // g = dlugosc bitowa b
+    this->swap('f');
+    this->add('f');
+    this->jzero(4);
+    this->shift('d');
+    this->inc('g');
+    this->jump(-3);
+    this->swap('f');
+    this->swap('b');
+    this->swap('h');
+    // roznica dlugosci
+    this->sub('g');
+    this->jneg(44);
+    this->reset('f');
+    this->swap('f');
+    this->add('f');
+    this->swap('f');
+    this->inc('f');
+    // a roznica h g
+    // wyrownanie do lewej
+    this->jzero(10);
+    this->swap('b');
+    this->inc('d');
+    this->inc('d');
+    this->shift('d');
+    this->dec('d');
+    this->dec('d');
+    this->dec('b');
+    this->swap('b');
+    this->jump(-9);
+    this->swap('h');
+    // a i wyrownane b
+    this->reset('h');
+    this->swap('f');
+    // petla
+    this->jzero(23);
+    this->reset('g');
+    this->swap('g');
+    this->add('f');
     this->sub('b');
+    this->swap('h');
+    this->inc('d');
+    this->inc('d');
+    this->shift('d');
+    this->dec('d');
+    this->dec('d');
+    this->swap('h');
+    this->jneg(5);
+    this->inc('h');
+    this->swap('f');
+    this->sub('b');
+    this->swap('f');
+    this->swap('b');
+    this->shift('d');
+    this->swap('b');
+    this->swap('g');
+    this->dec('a');
+    this->jump(-22);
+    this->swap('f');
+    this->jump(2);
+    this->swap('h');
+    // spr
+    this->swap('e');
+    this->jzero(21);
+    this->dec('a');
+    this->jzero(13);
+    this->dec('a');
+    this->jzero(7);
+    // dwa minusy
+    this->reset('g');
+    this->swap('e');
+    this->swap('g');
+    this->sub('g');
+    this->swap('e');
+    this->jump(11);
+    // minus w B
+    this->swap('e');
+    this->add('c');
+    this->swap('e');
+    this->jump(7);
+    // minus w A
+    this->reset('g');
+    this->swap('e');
+    this->swap('g');
+    this->sub('g');
+    this->add('c');
+    this->swap('e');
+    this->swap('e');
 
-    this->swap('c');
-    this->reset('a');
-    this->reset('b');
-    this->genOffset(0);
-    this->swap('c');
+    this->reset('c');
     this->store('c');
 
     this->reset('a');
     this->reset('b');
-    this->reset('c');
+    this->reset('d');
+    this->reset('e');
+    this->reset('f');
+    this->reset('g');
+    this->reset('h');
     return this->getSymbol("$$");
 }
 
@@ -454,7 +662,6 @@ void Code::incForLoopEnd(string i) {
     long long jumpTo = 0;
     long long start = 0;
 
-    dynamic_cast<Variable*>(this->getSymbol(i))->isInitialized(false);
     this->getSymbolOffset(this->getSymbol(i));
     this->swap('b');
     this->load('b');
@@ -481,6 +688,9 @@ void Code::incForLoopEnd(string i) {
         }
     }
 
+    data->variables.erase(i);
+    data->variables.erase(i + "-threshold");
+
     this->jump(-jumpTo);
     this->code[this->k - start - 1] += " " + to_string(start + 1) + "\n";
     this->reset('a');
@@ -490,7 +700,6 @@ void Code::decForLoopEnd(string i) {
     long long jumpTo = 0;
     long long start = 0;
     
-    dynamic_cast<Variable*>(this->getSymbol(i))->isInitialized(false);
     this->getSymbolOffset(this->getSymbol(i));
     this->swap('b');
     this->load('b');
@@ -517,71 +726,56 @@ void Code::decForLoopEnd(string i) {
         }
     }
 
+    data->variables.erase(i);
+    data->variables.erase(i + "-threshold");
+
     this->jump(-jumpTo);
     this->code[this->k - start - 1] += " " + to_string(start + 1) + "\n";
     this->reset('a');
 }
 
-void Code::genOffset(long long offset) {
-    if (offset == 0) return;
-    long long temp = offset;
-    long long power = 0;
-    long long result = offset;
-
-    this->inc('a');
-    while (result > 5) {
-        temp = result;
-        power = 0;
-        while (temp > 1) {
-            temp /= 2;
-            power++;
+void Code::genValue(long long value) {
+    bool negative = false;
+    if (value < 0) negative = true;
+    
+    if (abs(value) < 8) {
+        if (negative) for (long long i = 0; i > value; i--)
+                this->dec('a');
+        else for (long long i = 0; i < value; i++)
+                this->inc('a');
+    } else {
+        long long binary[64];
+        long long i = 0;
+        while (value != 0) {
+            binary[i] = abs(value % 2);
+            value /= 2;
+            i++;
         }
-        result -= pow(2, power);
-        for (int i = 0; i < power; i++) this->inc('b');
-        this->shift('b');
+        i--;
+
+        this->inc('b');
+        
+        for (; i > 0; i--) {
+            if (binary[i] == 1) {
+                if (negative) this->dec('a');
+                else this->inc('a');
+            }
+            this->shift('b');
+        }
+
+        if (binary[i] == 1) {
+            if (negative) this->dec('a');
+            else this->inc('a');
+        }
         this->reset('b');
-        this->swap('e');
-        this->add('e');
-        this->swap('e');
-        this->reset('a');
-        this->inc('a');
     }
-    this->swap('e');
-    this->reset('e');
-    for (int i = 0; i < result; i++) this->inc('a');
-
-    // while (temp > 1) {
-    //     temp /= 2;
-    //     power++;
-    // }
-
-    // temp = offset;
-    // temp = temp - pow(2, power);
-
-    // for (int i = 0; i < power; i++) this->inc('b');
-    // this->inc('a');
-    // this->shift('b');
-    // for (int i = 0; i < temp; i++) this->inc('a');
 }
 
 void Code::getSymbolOffset(Symbol* symbol) {
-    this->genOffset(symbol->getOffset());
+    this->genValue(symbol->getOffset());
 
     if (symbol->type == Type::pointer)
         this->load('a');
-}
-
-void Code::genValue(long long value) {
-    long long asAbs = abs(value);
-    this->genOffset(asAbs);
-
-    this->reset('b');
-    
-    if (value != asAbs) {
-        this->swap('b');
-        this->sub('b');
-        this->reset('b');
-    }
 }
 
 void Code::declareVariable(string id, Type type) {
@@ -616,7 +810,7 @@ Symbol* Code::getSymbol(string arr, string index) {
     this->swap('c');
     this->reset('a');
 
-    this->genOffset(array->getOffset());
+    this->genValue(array->getOffset());
     this->reset('b');
     this->add('c');
     
@@ -625,7 +819,7 @@ Symbol* Code::getSymbol(string arr, string index) {
     this->reset('b');
 
     Symbol* pointer = this->getPointer(arr + "[" + index + "]");
-    this->genOffset(pointer->getOffset());
+    this->genValue(pointer->getOffset());
     this->swap('c');
     this->store('c');
 
@@ -648,7 +842,7 @@ Symbol* Code::getNumber(long long value) {
     this->declareVariable(asString, Type::constant);
     Symbol* var = this->getSymbol(asString);
 
-    this->genOffset(var->getOffset());
+    this->genValue(var->getOffset());
     this->swap('c');
 
     this->reset('a');
