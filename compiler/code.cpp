@@ -104,7 +104,8 @@ void Code::halt() {
 void Code::assign(Symbol* id, Symbol* exp) {
     if (!dynamic_cast<Variable*>(exp)->isInitialized())
         yyerror("use of uninitialized variable");
-    dynamic_cast<Variable*>(id)->isInitialized(true);
+    if (dynamic_cast<Array*>(id) == nullptr)
+        dynamic_cast<Variable*>(id)->isInitialized(true);
     this->getSymbolOffset(id);
     this->swap('c');
 

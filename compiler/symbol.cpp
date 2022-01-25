@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 #include "symbol.hpp"
 
 extern int yyerror(std::string);
@@ -29,10 +30,16 @@ void Variable::isInitialized(bool initialized) {
 Array::Array(long long offset, long long start, long long end) : Symbol(offset, Type::array), start(start), end(end) {
     if (end < start) yyerror("incorrect array bounds");
     this->tab = new Variable*[end - start + 1];
-    for (int i = 0; i < end - start + 1; i++)
-        this->tab[i] = new Variable(this->getOffset() + i, Type::variable);
+    // for (long long i = 0; i < end - start + 1; i++) {
+    //     std::cout<<i<<std::endl;
+    //     this->tab[i] = new Variable(this->getOffset() + i, Type::variable);
+    // }
 }
 
 Symbol* Array::getSymbol(long long index) {
     return this->tab[index - start];
+}
+
+void Array::declareVariable(long long index) {
+    this->tab[index - start] = new Variable(this->getOffset() - start + index + 1, Type::variable);
 }

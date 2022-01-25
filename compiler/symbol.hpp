@@ -39,4 +39,5 @@ public:
     Array(long long, long long, long long);
     using Symbol::getOffset;
     Symbol* getSymbol(long long);
+    void declareVariable(long long);
 };

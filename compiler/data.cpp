@@ -32,6 +32,8 @@ Symbol* Data::getSymbol(string id) {
 }
 
 Symbol* Data::getSymbol(string id, long long index) {
+    dynamic_cast<Array*>(this->variables[id])->declareVariable(index);
+    dynamic_cast<Variable*>(this->variables[id]->getSymbol(index))->isInitialized(true);
     if (!isDeclared(id))
         yyerror("variable " + id + " isn't declared yet");
     return this->variables[id]->getSymbol(index);
